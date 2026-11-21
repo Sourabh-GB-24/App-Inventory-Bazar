@@ -1,0 +1,30 @@
+{
+  "expo": {
+    "name": "FreshCart",
+    "slug": "freshcart-ios",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "automatic",
+    "newArchEnabled": true,
+    "splash": {
+      "image": "./assets/splash-icon.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#34C759"
+    },
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.freshcart.inventorybazar",
+      "infoPlist": {
+        "ITSAppUsesNonExemptEncryption": false
+      }
+    },
+    "android": {
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/adaptive-icon.png",
+        "backgroundColor": "#34C759"
+      },
+      "package": "com.freshcart.inventorybazar"
+    }
+  }
+}
