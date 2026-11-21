@@ -1,0 +1,2357 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, maximum-scale=1.0, user-scalable=no" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+  <meta name="apple-mobile-web-app-title" content="FreshCart" />
+  <meta name="theme-color" content="#F2F2F7" />
+  <link rel="manifest" href="./manifest.webmanifest" />
+  <link rel="apple-touch-icon" href="./icon-192.png" />
+  <title>FreshCart — Offline Lists, Inventory &amp; Today</title>
+  <script>
+    (function () {
+      const ICONS = {
+        'apple': '<path d="M12 20.94c1.5 0 2.75 1.06 4 1.06 3 0 6-8 6-12.22A4.91 4.91 0 0 0 17 5c-2.22 0-4 1.44-5 2-1-.56-2.78-2-5-2a4.9 4.9 0 0 0-5 4.78C2 14 5 22 8 22c1.25 0 2.5-1.06 4-1.06Z"/><path d="M10 2c1 .5 2 2 2 5"/>',
+        'boxes': '<path d="M2.97 12.92A2 2 0 0 0 2 14.63v3.24a2 2 0 0 0 .97 1.71l3 1.8a2 2 0 0 0 2.06 0L12 19v-5.5l-5-3-4.03 2.42Z"/><path d="m7 16.5-4.74-2.85"/><path d="m7 16.5 5-3"/><path d="M7 16.5v5.17"/><path d="M12 13.5V19l3.97 2.38a2 2 0 0 0 2.06 0l3-1.8a2 2 0 0 0 .97-1.71v-3.24a2 2 0 0 0-.97-1.71L17 10.5l-5 3Z"/><path d="m17 16.5-5-3"/><path d="m17 16.5 4.74-2.85"/><path d="M17 16.5v5.17"/><path d="M7.97 4.42A2 2 0 0 0 7 6.13v4.37l5 3 5-3V6.13a2 2 0 0 0-.97-1.71l-3-1.8a2 2 0 0 0-2.06 0l-3 1.8Z"/><path d="M12 8 7.26 5.15"/><path d="m12 8 4.74-2.85"/><path d="M12 13.5V8"/>',
+        'check': '<path d="M20 6 9 17l-5-5"/>',
+        'check-circle-2': '<circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/>',
+        'check-square': '<rect width="18" height="18" x="3" y="3" rx="2"/><path d="m9 12 2 2 4-4"/>',
+        'chevron-down': '<path d="m6 9 6 6 6-6"/>',
+        'chevron-left': '<path d="m15 18-6-6 6-6"/>',
+        'chevron-right': '<path d="m9 18 6-6-6-6"/>',
+        'clock': '<circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>',
+        'cpu': '<rect width="16" height="16" x="4" y="4" rx="2"/><rect width="6" height="6" x="9" y="9" rx="1"/><path d="M15 2v2"/><path d="M15 20v2"/><path d="M2 15h2"/><path d="M2 9h2"/><path d="M20 15h2"/><path d="M20 9h2"/><path d="M9 2v2"/><path d="M9 20v2"/>',
+        'folder': '<path d="M20 20a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.9a2 2 0 0 1-1.69-.9L9.6 3.9A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2Z"/>',
+        'heart': '<path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/>',
+        'list-checks': '<path d="m3 17 2 2 4-4"/><path d="m3 7 2 2 4-4"/><path d="M13 6h8"/><path d="M13 12h8"/><path d="M13 18h8"/>',
+        'menu': '<line x1="4" x2="20" y1="12" y2="12"/><line x1="4" x2="20" y1="6" y2="6"/><line x1="4" x2="20" y1="18" y2="18"/>',
+        'minus': '<path d="M5 12h14"/>',
+        'moon': '<path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/>',
+        'package': '<path d="m7.5 4.27 9 5.15"/><path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"/><path d="m3.3 7 8.7 5 8.7-5"/><path d="M12 22V12"/>',
+        'plus': '<path d="M5 12h14"/><path d="M12 5v14"/>',
+        'rotate-ccw': '<path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/>',
+        'search': '<circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/>',
+        'settings': '<path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/>',
+        'share': '<path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" x2="12" y1="2" y2="15"/>',
+        'shirt': '<path d="M20.38 3.46 16 2a4 4 0 0 1-8 0L3.62 3.46a2 2 0 0 0-1.34 2.23l.58 3.47a1 1 0 0 0 .99.84H6v10c0 1.1.9 2 2 2h8a2 2 0 0 0 2-2V10h2.15a1 1 0 0 0 .99-.84l.58-3.47a2 2 0 0 0-1.34-2.23z"/>',
+        'shopping-bag': '<path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"/><path d="M3 6h18"/><path d="M16 10a4 4 0 0 1-8 0"/>',
+        'shopping-basket': '<path d="m15 11-1 9"/><path d="m19 11-4-7"/><path d="M2 11h20"/><path d="m3.5 11 1.6 7.4a2 2 0 0 0 2 1.6h9.8a2 2 0 0 0 2-1.6l1.7-7.4"/><path d="M4.5 15.5h15"/><path d="m5 11 4-7"/><path d="m9 11 1 9"/>',
+        'shopping-cart': '<circle cx="8" cy="21" r="1"/><circle cx="19" cy="21" r="1"/><path d="M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 1.95-1.57l1.65-7.43H5.12"/>',
+        'sliders-horizontal': '<line x1="21" x2="14" y1="4" y2="4"/><line x1="10" x2="3" y1="4" y2="4"/><line x1="21" x2="12" y1="12" y2="12"/><line x1="8" x2="3" y1="12" y2="12"/><line x1="21" x2="16" y1="20" y2="20"/><line x1="12" x2="3" y1="20" y2="20"/><line x1="14" x2="14" y1="2" y2="6"/><line x1="8" x2="8" y1="10" y2="14"/><line x1="16" x2="16" y1="18" y2="22"/>',
+        'sparkles': '<path d="M9.937 15.5A2 2 0 0 0 8.5 14.063l-6.135-1.582a.5.5 0 0 1 0-.962L8.5 9.936A2 2 0 0 0 9.937 8.5l1.582-6.135a.5.5 0 0 1 .963 0L14.063 8.5A2 2 0 0 0 15.5 9.937l6.135 1.581a.5.5 0 0 1 0 .964L15.5 14.063a2 2 0 0 0-1.437 1.437l-1.582 6.135a.5.5 0 0 1-.963 0z"/><path d="M20 3v4"/><path d="M22 5h-4"/>',
+        'sticky-note': '<path d="M16 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V8Z"/><path d="M15 3v4a2 2 0 0 0 2 2h4"/>',
+        'sun': '<circle cx="12" cy="12" r="4"/><path d="M12 2v2"/><path d="M12 20v2"/><path d="m4.93 4.93 1.41 1.41"/><path d="m17.66 17.66 1.41 1.41"/><path d="M2 12h2"/><path d="M20 12h2"/><path d="m6.34 17.66-1.41 1.41"/><path d="m19.07 4.93-1.41 1.41"/>',
+        'trash-2': '<path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/><line x1="10" x2="10" y1="11" y2="17"/><line x1="14" x2="14" y1="11" y2="17"/>',
+        'watch': '<circle cx="12" cy="12" r="6"/><polyline points="12 10 12 12 13 13"/><path d="m16.13 7.66-.81-4.05a2 2 0 0 0-2-1.61h-2.68a2 2 0 0 0-2 1.61l-.78 4.05"/><path d="m7.88 16.36.8 4a2 2 0 0 0 2 1.61h2.72a2 2 0 0 0 2-1.61l.81-4.05"/>',
+        'x': '<path d="M18 6 6 18"/><path d="m6 6 12 12"/>'
+      };
+      window.lucide = {
+        createIcons: function () {
+          document.querySelectorAll('i[data-lucide]').forEach(function (el) {
+            const name = el.getAttribute('data-lucide');
+            const body = ICONS[name] || ICONS['folder'];
+            const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+            svg.setAttribute('viewBox', '0 0 24 24');
+            svg.setAttribute('fill', 'none');
+            svg.setAttribute('stroke', 'currentColor');
+            svg.setAttribute('stroke-width', '2');
+            svg.setAttribute('stroke-linecap', 'round');
+            svg.setAttribute('stroke-linejoin', 'round');
+            if (el.id) svg.id = el.id;
+            if (el.getAttribute('class')) svg.setAttribute('class', el.getAttribute('class'));
+            if (el.getAttribute('style')) svg.setAttribute('style', el.getAttribute('style'));
+            svg.innerHTML = body;
+            el.replaceWith(svg);
+          });
+        }
+      };
+    })();
+  </script>
+
+  <style>
+
+    /* ==================== ZERO-CDN UTILITY CSS (iPhone 11+ Compatible) ==================== */
+    button, input, select, textarea { font-family: inherit; font-size: inherit; color: inherit; margin: 0; }
+    button { background: transparent; border: 0; padding: 0; cursor: pointer; }
+    h1, h2, h3, p { margin: 0; }
+    a { color: inherit; }
+
+    .hidden { display: none !important; }
+    .block { display: block; }
+    .inline-block { display: inline-block; }
+    .flex { display: flex; }
+    .inline-flex { display: inline-flex; }
+    .grid { display: grid; }
+    .flex-1 { flex: 1 1 0%; }
+    .flex-col { flex-direction: column; }
+    .flex-wrap { flex-wrap: wrap; }
+    .shrink-0 { flex-shrink: 0; }
+    .items-center { align-items: center; }
+    .items-end { align-items: flex-end; }
+    .justify-center { justify-content: center; }
+    .justify-between { justify-content: space-between; }
+    .grid-cols-2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .grid-cols-3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+    .grid-cols-6 { grid-template-columns: repeat(6, minmax(0, 1fr)); }
+
+    .relative { position: relative; }
+    .absolute { position: absolute; }
+    .fixed { position: fixed; }
+    .sticky { position: sticky; }
+    .inset-0 { top: 0; right: 0; bottom: 0; left: 0; }
+    .top-0 { top: 0; }
+    .top-1\/2 { top: 50%; }
+    .left-1\/2 { left: 50%; }
+    .left-2\.5 { left: 10px; }
+    .bottom-24 { bottom: 96px; }
+    .-translate-x-1\/2 { transform: translateX(-50%); }
+    .-translate-y-1\/2 { transform: translateY(-50%); }
+    .z-10 { z-index: 10; }
+    .z-30 { z-index: 30; }
+    .z-40 { z-index: 40; }
+    .z-50 { z-index: 50; }
+    .pointer-events-none { pointer-events: none; }
+    .overflow-hidden { overflow: hidden; }
+    .overflow-y-auto { overflow-y: auto; -webkit-overflow-scrolling: touch; }
+    .resize-none { resize: none; }
+
+    .mx-auto { margin-left: auto; margin-right: auto; }
+    .mt-0\.5 { margin-top: 2px; }
+    .mb-1 { margin-bottom: 4px; }
+    .mb-1\.5 { margin-bottom: 6px; }
+
+    .p-0 { padding: 0; }
+    .p-1 { padding: 4px; }
+    .p-1\.5 { padding: 6px; }
+    .p-2\.5 { padding: 10px; }
+    .p-3 { padding: 12px; }
+    .p-4 { padding: 16px; }
+    .p-6 { padding: 24px; }
+    .px-0\.5 { padding-left: 2px; padding-right: 2px; }
+    .px-1 { padding-left: 4px; padding-right: 4px; }
+    .px-1\.5 { padding-left: 6px; padding-right: 6px; }
+    .px-2 { padding-left: 8px; padding-right: 8px; }
+    .px-2\.5 { padding-left: 10px; padding-right: 10px; }
+    .px-3 { padding-left: 12px; padding-right: 12px; }
+    .px-3\.5 { padding-left: 14px; padding-right: 14px; }
+    .px-4 { padding-left: 16px; padding-right: 16px; }
+    .py-0\.5 { padding-top: 2px; padding-bottom: 2px; }
+    .py-1 { padding-top: 4px; padding-bottom: 4px; }
+    .py-1\.5 { padding-top: 6px; padding-bottom: 6px; }
+    .py-2 { padding-top: 8px; padding-bottom: 8px; }
+    .py-2\.5 { padding-top: 10px; padding-bottom: 10px; }
+    .py-3 { padding-top: 12px; padding-bottom: 12px; }
+    .py-3\.5 { padding-top: 14px; padding-bottom: 14px; }
+    .pt-1 { padding-top: 4px; }
+    .pt-2 { padding-top: 8px; }
+    .pt-2\.5 { padding-top: 10px; }
+    .pt-3 { padding-top: 12px; }
+    .pb-2 { padding-bottom: 8px; }
+    .pb-2\.5 { padding-bottom: 10px; }
+    .pb-28 { padding-bottom: calc(112px + env(safe-area-inset-bottom, 0px)); }
+    .pl-3 { padding-left: 12px; }
+    .pl-6 { padding-left: 24px; }
+    .pl-8 { padding-left: 32px; }
+    .pr-2 { padding-right: 8px; }
+    .pr-2\.5 { padding-right: 10px; }
+
+    .gap-0\.5 { gap: 2px; }
+    .gap-1 { gap: 4px; }
+    .gap-1\.5 { gap: 6px; }
+    .gap-2 { gap: 8px; }
+    .gap-2\.5 { gap: 10px; }
+    .gap-3 { gap: 12px; }
+    .space-y-1 > * + * { margin-top: 4px; }
+    .space-y-1\.5 > * + * { margin-top: 6px; }
+    .space-y-2 > * + * { margin-top: 8px; }
+    .space-y-2\.5 > * + * { margin-top: 10px; }
+    .space-y-3 > * + * { margin-top: 12px; }
+    .space-y-4 > * + * { margin-top: 16px; }
+
+    .w-1\.5 { width: 6px; } .h-1\.5 { height: 6px; }
+    .w-2 { width: 8px; } .h-2 { height: 8px; }
+    .w-3 { width: 12px; } .h-3 { height: 12px; }
+    .w-3\.5 { width: 14px; } .h-3\.5 { height: 14px; }
+    .w-4 { width: 16px; } .h-4 { height: 16px; }
+    .w-5 { width: 20px; } .h-5 { height: 20px; }
+    .w-6 { width: 24px; } .h-6 { height: 24px; }
+    .w-7 { width: 28px; } .h-7 { height: 28px; }
+    .w-8 { width: 32px; } .h-8 { height: 32px; }
+    .w-9 { width: 36px; } .h-9 { height: 36px; }
+    .w-10 { width: 40px; }
+    .w-14 { width: 56px; }
+    .w-72 { width: 288px; }
+    .w-full { width: 100%; }
+    .h-full { height: 100%; }
+    .min-w-0 { min-width: 0; }
+    .min-w-\[105px\] { min-width: 105px; }
+    .min-h-\[200px\] { min-height: 200px; }
+    .max-w-sm { max-width: 384px; }
+    .max-w-md { max-width: 448px; }
+    .max-w-\[84vw\] { max-width: 84vw; }
+    .max-h-\[88dvh\] { max-height: 88vh; max-height: 88dvh; }
+
+    .rounded-md { border-radius: 6px; }
+    .rounded-\[7px\] { border-radius: 7px; }
+    .rounded-lg { border-radius: 8px; }
+    .rounded-xl { border-radius: 12px; }
+    .rounded-full { border-radius: 9999px; }
+    .rounded-b-none { border-bottom-left-radius: 0; border-bottom-right-radius: 0; }
+
+    .border { border-width: 1px; border-style: solid; border-color: var(--border-hairline); }
+    .border-t { border-top-width: 1px; border-top-style: solid; border-top-color: var(--border-hairline); }
+    .border-b { border-bottom-width: 1px; border-bottom-style: solid; border-bottom-color: var(--border-hairline); }
+    .border-white\/10 { border-color: rgba(255, 255, 255, 0.10); }
+
+    .bg-transparent { background-color: transparent; }
+    .bg-zinc-900\/95 { background-color: rgba(24, 24, 27, 0.95); }
+    html.dark .dark\:bg-zinc-800 { background-color: #27272a; }
+    .hover\:bg-black\/5:hover { background-color: rgba(0, 0, 0, 0.05); }
+    html.dark .dark\:hover\:bg-white\/10:hover { background-color: rgba(255, 255, 255, 0.10); }
+
+    .text-white { color: #FFFFFF; }
+    .text-blue-400 { color: #60A5FA; }
+    .text-xl { font-size: 20px; line-height: 28px; }
+    .text-left { text-align: left; }
+    .text-center { text-align: center; }
+    .font-medium { font-weight: 500; }
+    .font-semibold { font-weight: 600; }
+    .font-bold { font-weight: 700; }
+    .uppercase { text-transform: uppercase; }
+    .underline { text-decoration: underline; }
+    .line-through { text-decoration: line-through; }
+    .tracking-tight { letter-spacing: -0.025em; }
+    .tracking-wider { letter-spacing: 0.05em; }
+    .leading-tight { line-height: 1.25; }
+    .leading-relaxed { line-height: 1.625; }
+    .truncate { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+    .opacity-50 { opacity: 0.5; }
+    .opacity-60 { opacity: 0.6; }
+    .opacity-80 { opacity: 0.8; }
+    .disabled\:opacity-40:disabled { opacity: 0.4; cursor: not-allowed; }
+    .hover\:opacity-75:hover { opacity: 0.75; }
+    .hover\:opacity-90:hover { opacity: 0.9; }
+
+    .shadow-sm { box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05); }
+    .shadow-lg { box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.15), 0 4px 6px -4px rgba(0, 0, 0, 0.1); }
+    .shadow-2xl { box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.28); }
+    .ring-2 { box-shadow: 0 0 0 2px #FFFFFF, 0 0 0 4px #A1A1AA; }
+    .ring-blue-500 { box-shadow: 0 0 0 2px #FFFFFF, 0 0 0 4px #3B82F6; }
+    .scale-110 { transform: scale(1.1); }
+    .active\:scale-95:active { transform: scale(0.95); }
+    .active\:scale-\[0\.98\]:active { transform: scale(0.98); }
+    .transition { transition: all 0.15s ease; }
+    .transition-colors { transition: color 0.15s ease, background-color 0.15s ease, border-color 0.15s ease; }
+    .transition-transform { transition: transform 0.2s ease; }
+    .duration-200 { transition-duration: 200ms; }
+    .focus\:outline-none:focus { outline: none; }
+    .stroke-\[3\] { stroke-width: 3; }
+
+    @media (min-width: 640px) {
+      .sm\:hidden { display: none !important; }
+      .sm\:items-center { align-items: center; }
+      .sm\:p-4 { padding: 16px; }
+      .sm\:rounded-2xl { border-radius: 16px; }
+    }
+
+    :root {
+      --bg-page: #F2F2F7;
+      --bg-card: #FFFFFF;
+      --bg-secondary: #E5E5EA;
+      --bg-input: #EFEFF4;
+      --text-primary: #1C1C1E;
+      --text-secondary: #6E6E73;
+      --text-tertiary: #8E8E93;
+      --border-hairline: rgba(60, 60, 67, 0.12);
+      --ios-blue: #007AFF;
+      --ios-green: #34C759;
+      --ios-orange: #FF9500;
+      --ios-red: #FF3B30;
+      --nav-blur: rgba(248, 248, 252, 0.78);
+      --dock-bg: rgba(242, 242, 247, 0.76);
+      --dock-border: rgba(255, 255, 255, 0.82);
+      --loupe-bg: rgba(245, 245, 250, 0.90);
+      --lens-bg: rgba(255, 255, 255, 0.34);
+      --lens-border: rgba(255, 255, 255, 0.92);
+      --bg-card-glass: rgba(255, 255, 255, 0.74);
+      --card-border-glass: rgba(255, 255, 255, 0.85);
+      --card-sheen: inset 0 1px 0 rgba(255, 255, 255, 0.95), inset 0 -0.5px 0 rgba(0, 0, 0, 0.04);
+      --fs-title: 14px;
+      --fs-body: 12px;
+      --fs-sub: 10.5px;
+      --fs-xs: 9.5px;
+    }
+
+    html[data-font-size="small"]  { --fs-title: 14px; --fs-body: 12px; --fs-sub: 10.5px; --fs-xs: 9.5px; }
+    html[data-font-size="medium"] { --fs-title: 15.5px; --fs-body: 13.5px; --fs-sub: 11.5px; --fs-xs: 10.5px; }
+    html[data-font-size="large"]  { --fs-title: 17px; --fs-body: 15px; --fs-sub: 12.5px; --fs-xs: 11px; }
+
+    html.dark {
+      --bg-page: #000000;
+      --bg-card: #1C1C1E;
+      --bg-secondary: #2C2C2E;
+      --bg-input: #2C2C2E;
+      --text-primary: #F2F2F7;
+      --text-secondary: #AEAEB2;
+      --text-tertiary: #8E8E93;
+      --border-hairline: rgba(255, 255, 255, 0.12);
+      --ios-green: #30D158;
+      --ios-orange: #FF9F0A;
+      --ios-red: #FF453A;
+      --nav-blur: rgba(24, 24, 28, 0.78);
+      --dock-bg: rgba(34, 34, 38, 0.84);
+      --dock-border: rgba(255, 255, 255, 0.16);
+      --loupe-bg: rgba(38, 38, 42, 0.90);
+      --lens-bg: rgba(255, 255, 255, 0.08);
+      --lens-border: rgba(255, 255, 255, 0.55);
+      --bg-card-glass: rgba(30, 30, 34, 0.78);
+      --card-border-glass: rgba(255, 255, 255, 0.13);
+      --card-sheen: inset 0 1px 0 rgba(255, 255, 255, 0.14), inset 0 -0.5px 0 rgba(0, 0, 0, 0.35);
+    }
+
+    * { -webkit-tap-highlight-color: transparent; box-sizing: border-box; }
+    button:focus { outline: none; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display", "Inter", system-ui, sans-serif;
+      font-size: var(--fs-body);
+      background-color: var(--bg-page);
+      color: var(--text-primary);
+      margin: 0;
+      min-height: 100vh;
+      min-height: 100dvh;
+      transition: background-color 0.2s ease, color 0.2s ease;
+    }
+
+    .fs-title { font-size: var(--fs-title); }
+    .fs-body { font-size: var(--fs-body); }
+    .fs-sub { font-size: var(--fs-sub); }
+    .fs-xs { font-size: var(--fs-xs); }
+
+    .ios-card {
+      background-color: var(--bg-card-glass);
+      backdrop-filter: saturate(160%) blur(18px);
+      -webkit-backdrop-filter: saturate(160%) blur(18px);
+      border-radius: 18px;
+      border: 0.75px solid var(--card-border-glass);
+      box-shadow: var(--card-sheen), 0 4px 16px rgba(0, 0, 0, 0.05);
+    }
+    html.dark .ios-card {
+      box-shadow: var(--card-sheen), 0 6px 20px rgba(0, 0, 0, 0.36);
+    }
+
+    /* Apple iOS 26 Settings-style dimensional Liquid Glass icon squircle */
+    .glass-icon-tile {
+      position: relative;
+      overflow: hidden;
+      border-radius: 10px;
+      border: 0.75px solid rgba(255, 255, 255, 0.48);
+      background-image: linear-gradient(
+        180deg,
+        rgba(255, 255, 255, 0.36) 0%,
+        rgba(255, 255, 255, 0.10) 44%,
+        rgba(0, 0, 0, 0.04) 72%,
+        rgba(0, 0, 0, 0.16) 100%
+      );
+      box-shadow:
+        inset 0 1px 0.75px rgba(255, 255, 255, 0.78),
+        inset 0 -1px 1.5px rgba(0, 0, 0, 0.20),
+        inset 1px 0 0.75px rgba(255, 255, 255, 0.32),
+        inset -1px 0 0.75px rgba(255, 255, 255, 0.32),
+        0 2px 7px rgba(0, 0, 0, 0.14);
+    }
+    .glass-icon-tile::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      border-radius: inherit;
+      pointer-events: none;
+      background: linear-gradient(
+        145deg,
+        rgba(255, 255, 255, 0.42) 0%,
+        rgba(255, 255, 255, 0.10) 38%,
+        rgba(255, 255, 255, 0.0) 58%
+      );
+    }
+    .glass-icon-tile svg,
+    .glass-icon-tile i {
+      position: relative;
+      z-index: 1;
+      filter: drop-shadow(0 1px 1.5px rgba(0, 0, 0, 0.22));
+    }
+    html.dark .glass-icon-tile {
+      border-color: rgba(255, 255, 255, 0.36);
+      box-shadow:
+        inset 0 1px 0.75px rgba(255, 255, 255, 0.68),
+        inset 0 -1px 1.5px rgba(0, 0, 0, 0.36),
+        inset 1px 0 0.75px rgba(255, 255, 255, 0.24),
+        inset -1px 0 0.75px rgba(255, 255, 255, 0.24),
+        0 3px 10px rgba(0, 0, 0, 0.42);
+    }
+    .ios-input { background-color: var(--bg-input); color: var(--text-primary); }
+    .ios-input::placeholder { color: var(--text-tertiary); }
+    .ios-divider { border-color: var(--border-hairline); }
+
+    .ios-nav {
+      background-color: var(--nav-blur);
+      backdrop-filter: saturate(180%) blur(20px);
+      -webkit-backdrop-filter: saturate(180%) blur(20px);
+      border-bottom: 0.5px solid var(--border-hairline);
+    }
+
+    .ios-segmented { background-color: var(--bg-secondary); border-radius: 9px; padding: 2px; }
+    .ios-seg-btn { color: var(--text-secondary); transition: all 0.18s ease; }
+    .ios-seg-btn.active { background-color: var(--bg-card); color: var(--text-primary); box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1); }
+
+    .ios-grabber { width: 36px; height: 4px; border-radius: 9999px; background-color: var(--text-tertiary); opacity: 0.38; margin: 0 auto 10px; }
+
+    .check-circle {
+      width: 20px; height: 20px; border-radius: 9999px;
+      border: 1.75px solid var(--text-tertiary);
+      display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+      transition: all 0.16s ease;
+    }
+    .check-circle.checked {
+      background: linear-gradient(145deg, #34C759, #24B44B);
+      border-color: transparent; color: #FFFFFF;
+      box-shadow: 0 2px 6px rgba(52, 199, 89, 0.32), inset 0 1px 0 rgba(255,255,255,0.4);
+      animation: checkPop 0.24s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+    @keyframes checkPop { 0% { transform: scale(0.8); } 55% { transform: scale(1.16); } 100% { transform: scale(1); } }
+
+    .stepper-pill { background-color: var(--bg-input); border: 0.5px solid var(--border-hairline); border-radius: 9999px; }
+    .stepper-btn { width: 23px; height: 23px; border-radius: 9999px; display: inline-flex; align-items: center; justify-content: center; transition: background-color 0.12s ease, transform 0.1s ease; }
+    .stepper-btn:active { transform: scale(0.9); background-color: var(--bg-secondary); }
+    .inline-unit-select { background: transparent; color: var(--text-secondary); font-size: var(--fs-xs); font-weight: 500; border: none; outline: none; cursor: pointer; padding: 0 2px; max-width: 62px; }
+
+    .no-scrollbar::-webkit-scrollbar { display: none; }
+    .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+    .modal-backdrop { background-color: rgba(0, 0, 0, 0.45); backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px); }
+
+    .drawer-panel {
+      background-color: var(--bg-card);
+      border-right: 0.5px solid var(--border-hairline);
+      transform: translateX(-100%);
+      transition: transform 0.24s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .drawer-open .drawer-panel { transform: translateX(0); }
+
+    .dash-tile {
+      background-color: var(--bg-card-glass);
+      backdrop-filter: saturate(160%) blur(18px);
+      -webkit-backdrop-filter: saturate(160%) blur(18px);
+      border: 0.75px solid var(--card-border-glass);
+      border-radius: 18px;
+      box-shadow: var(--card-sheen), 0 4px 14px rgba(0, 0, 0, 0.045);
+      transition: transform 0.15s ease, box-shadow 0.15s ease;
+    }
+    html.dark .dash-tile {
+      box-shadow: var(--card-sheen), 0 6px 18px rgba(0, 0, 0, 0.34);
+    }
+    .dash-tile:hover { transform: translateY(-1px); box-shadow: 0 6px 16px rgba(0, 0, 0, 0.06); }
+    .dash-tile:active { transform: scale(0.985); }
+
+    .view-enter { animation: viewFadeSlide 0.22s cubic-bezier(0.22, 1, 0.36, 1); }
+    @keyframes viewFadeSlide { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
+    @keyframes slideUp { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+    .animate-sheet { animation: slideUp 0.2s cubic-bezier(0.16, 1, 0.3, 1); }
+
+    /* ==================== SWIPEABLE ROW (Right = Delete, Left = For Today) ==================== */
+    .swipe-shell {
+      position: relative;
+      overflow: hidden;
+    }
+    .swipe-actions-bg {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      justify-content: space-between;
+      align-items: stretch;
+    }
+    .swipe-btn-delete {
+      background: linear-gradient(135deg, #FF453A, #FF3B30);
+      color: #FFFFFF;
+      width: 92px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 4px;
+      font-size: var(--fs-xs);
+      font-weight: 700;
+      flex-shrink: 0;
+    }
+    .swipe-btn-today {
+      background: linear-gradient(135deg, #FF9F0A, #FF9500);
+      color: #FFFFFF;
+      width: 96px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 4px;
+      font-size: var(--fs-xs);
+      font-weight: 700;
+      flex-shrink: 0;
+    }
+    .swipe-content {
+      position: relative;
+      z-index: 2;
+      background-color: var(--bg-card);
+      transition: transform 0.22s cubic-bezier(0.22, 1, 0.36, 1);
+      touch-action: pan-y;
+    }
+    .swipe-content.swiping {
+      transition: none;
+    }
+
+    /* ==================== APPLE iOS 26 CLEAR LIQUID GLASS LOUPE SLIDER ==================== */
+    .island-wrap {
+      position: fixed;
+      bottom: calc(14px + env(safe-area-inset-bottom));
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 35;
+      width: min(376px, calc(100vw - 24px));
+    }
+    .island-dock {
+      position: relative;
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      padding: 5px;
+      border-radius: 9999px;
+      background: var(--dock-bg);
+      backdrop-filter: saturate(200%) blur(24px);
+      -webkit-backdrop-filter: saturate(200%) blur(24px);
+      border: 0.75px solid var(--dock-border);
+      box-shadow: 0 12px 32px rgba(0, 0, 0, 0.18), inset 0 1px 0 rgba(255, 255, 255, 0.35);
+      touch-action: none;
+      user-select: none;
+      -webkit-user-select: none;
+      cursor: grab;
+      overflow: visible;
+    }
+    .island-dock:active { cursor: grabbing; }
+
+    /* Resting state: subtle 10% fogged glass pill cleanly behind active icon (neutral etched rim, zero color haze) */
+    .island-lens {
+      position: absolute;
+      top: 5px;
+      left: 5px;
+      width: calc((100% - 10px) / 4);
+      height: calc(100% - 10px);
+      border-radius: 9999px;
+      background: rgba(120, 120, 128, 0.11);
+      backdrop-filter: blur(4px);
+      -webkit-backdrop-filter: blur(4px);
+      border: 0.75px solid rgba(255, 255, 255, 0.30);
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.36);
+      transition:
+        transform 0.28s cubic-bezier(0.22, 1.12, 0.36, 1),
+        opacity 0.16s ease;
+      pointer-events: none;
+      z-index: 1;
+    }
+    html.dark .island-lens {
+      background: rgba(255, 255, 255, 0.10);
+      border-color: rgba(255, 255, 255, 0.14);
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.18);
+    }
+    .island-dock.magnifying .island-lens {
+      opacity: 0;
+      transition: opacity 0.12s ease;
+    }
+
+    /* Moving / Off-Rest state: true overhanging transparent/etched magnifying glass loupe (zero colored haze) */
+    .island-loupe {
+      position: absolute;
+      top: -10px;
+      left: 0;
+      height: calc(100% + 20px);
+      border-radius: 9999px;
+      overflow: hidden;
+      pointer-events: none;
+      z-index: 5;
+      opacity: 0;
+      transform: translate3d(0, 0, 0) scale(0.88, 0.78);
+      transform-origin: center center;
+      background: var(--loupe-bg);
+      backdrop-filter: blur(8px) saturate(135%);
+      -webkit-backdrop-filter: blur(8px) saturate(135%);
+      border: 1px solid rgba(255, 255, 255, 0.72);
+      box-shadow:
+        inset 0 1.5px 1px rgba(255, 255, 255, 0.92),
+        inset 0 -1.5px 1px rgba(255, 255, 255, 0.45),
+        inset 1px 0 1px rgba(255, 255, 255, 0.32),
+        inset -1px 0 1px rgba(255, 255, 255, 0.32),
+        0 10px 26px rgba(0, 0, 0, 0.20),
+        0 2px 6px rgba(0, 0, 0, 0.10);
+      transition: opacity 0.14s ease;
+      will-change: transform, opacity;
+      contain: layout style;
+    }
+    html.dark .island-loupe {
+      border-color: rgba(255, 255, 255, 0.42);
+      box-shadow:
+        inset 0 1.5px 1px rgba(255, 255, 255, 0.62),
+        inset 0 -1.5px 1px rgba(255, 255, 255, 0.24),
+        inset 1px 0 1px rgba(255, 255, 255, 0.20),
+        inset -1px 0 1px rgba(255, 255, 255, 0.20),
+        0 12px 30px rgba(0, 0, 0, 0.48);
+    }
+    /* Crisp etched glass surface sheen over the magnified icons */
+    .island-loupe::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      border-radius: 9999px;
+      pointer-events: none;
+      background: linear-gradient(
+        180deg,
+        rgba(255, 255, 255, 0.28) 0%,
+        rgba(255, 255, 255, 0.03) 42%,
+        rgba(255, 255, 255, 0.00) 68%,
+        rgba(255, 255, 255, 0.14) 100%
+      );
+      border: 0.75px solid rgba(255, 255, 255, 0.35);
+    }
+    html.dark .island-loupe::after {
+      background: linear-gradient(
+        180deg,
+        rgba(255, 255, 255, 0.16) 0%,
+        rgba(255, 255, 255, 0.02) 44%,
+        rgba(255, 255, 255, 0.00) 70%,
+        rgba(255, 255, 255, 0.08) 100%
+      );
+      border-color: rgba(255, 255, 255, 0.18);
+    }
+    .island-dock.magnifying .island-loupe {
+      opacity: 1;
+      transition: opacity 0.12s ease;
+    }
+    .island-loupe-track {
+      position: absolute;
+      top: 0;
+      left: 0;
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      transform-origin: 0 0;
+      pointer-events: none;
+      will-change: transform;
+    }
+
+    .island-tab {
+      position: relative;
+      z-index: 2;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 2px;
+      padding: 6px 2px;
+      border-radius: 9999px;
+      color: var(--text-secondary);
+      font-size: 10px;
+      font-weight: 600;
+      transition: color 0.16s ease;
+    }
+    .island-tab.active {
+      color: var(--ios-blue);
+    }
+  </style>
+</head>
+<body class="pb-28">
+  <!-- Sticky Top Header -->
+  <header class="ios-nav sticky top-0 z-30">
+    <div class="max-w-md mx-auto px-3.5 pt-2.5 pb-2.5">
+      <div class="flex items-center justify-between gap-2">
+        <div class="flex items-center gap-2 min-w-0">
+          <button id="openDrawerBtn" type="button" title="Open Menu, Notepad & Settings" aria-label="Open menu" class="p-1.5 rounded-lg hover:bg-black/5 dark:hover:bg-white/10 transition shrink-0" style="color: var(--ios-blue);">
+            <i data-lucide="menu" class="w-5 h-5"></i>
+          </button>
+
+          <button id="backBtn" type="button" class="hidden inline-flex items-center gap-0.5 px-1.5 py-1 rounded-lg hover:bg-black/5 dark:hover:bg-white/10 transition shrink-0 fs-sub font-semibold" style="color: var(--ios-blue);">
+            <i data-lucide="chevron-left" class="w-4 h-4"></i>
+            <span id="backBtnLabel">Back</span>
+          </button>
+
+          <div id="headerBadge" class="glass-icon-tile w-8 h-8 flex items-center justify-center text-white shadow-sm shrink-0 transition-colors" style="background-color: var(--ios-blue);">
+            <i data-lucide="shopping-basket" class="w-4 h-4"></i>
+          </div>
+          <div class="min-w-0">
+            <h1 id="headerTitle" class="fs-title font-bold tracking-tight leading-tight truncate">FreshCart</h1>
+            <p id="headerSubtitle" class="fs-sub font-medium truncate" style="color: var(--text-secondary);">0 pending items</p>
+          </div>
+        </div>
+
+        <div class="flex items-center gap-1 shrink-0">
+          <button id="copyListBtn" type="button" title="Copy list" class="p-1.5 rounded-full hover:bg-black/5 dark:hover:bg-white/10 transition" style="color: var(--ios-blue);">
+            <i data-lucide="share" class="w-4 h-4"></i>
+          </button>
+          <button id="themeToggleBtn" type="button" title="Toggle Dark Mode" class="p-1.5 rounded-full hover:bg-black/5 dark:hover:bg-white/10 transition" style="color: var(--text-secondary);">
+            <i data-lucide="moon" class="w-4 h-4"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Left Slide-Out Drawer (Nav + Notepad + Settings) -->
+  <div id="drawerOverlay" class="hidden fixed inset-0 z-40">
+    <div id="drawerBackdrop" class="absolute inset-0 modal-backdrop"></div>
+    <aside class="drawer-panel relative z-10 w-72 max-w-[84vw] h-full flex flex-col shadow-2xl">
+      <div class="px-4 py-3.5 border-b ios-divider flex items-center justify-between">
+        <div class="flex items-center gap-2">
+          <div id="drawerAppBadge" class="glass-icon-tile w-8 h-8 flex items-center justify-center text-white" style="background-color: var(--ios-blue);">
+            <i data-lucide="shopping-basket" class="w-4 h-4"></i>
+          </div>
+          <span class="fs-title font-bold">FreshCart</span>
+        </div>
+        <button id="closeDrawerBtn" type="button" aria-label="Close menu" class="p-1 rounded-full" style="background-color: var(--bg-input); color: var(--text-secondary);">
+          <i data-lucide="x" class="w-4 h-4"></i>
+        </button>
+      </div>
+
+      <div class="flex-1 overflow-y-auto px-3 py-3 flex flex-col gap-3">
+        <div class="space-y-1">
+          <button id="navTodayBtn" type="button" class="w-full flex items-center justify-between px-3 py-2 rounded-xl fs-body font-semibold transition">
+            <span class="flex items-center gap-2.5"><i data-lucide="sun" class="w-4 h-4"></i><span>Today</span></span>
+            <span id="drawerTodayCount" class="fs-xs px-2 py-0.5 rounded-full font-semibold" style="background-color: var(--bg-input); color: var(--text-secondary);">0</span>
+          </button>
+          <button id="navTodoBtn" type="button" class="w-full flex items-center justify-between px-3 py-2 rounded-xl fs-body font-semibold transition">
+            <span class="flex items-center gap-2.5"><i data-lucide="check-square" class="w-4 h-4"></i><span>To-Do</span></span>
+            <span id="drawerTodoCount" class="fs-xs px-2 py-0.5 rounded-full font-semibold" style="background-color: var(--bg-input); color: var(--text-secondary);">0</span>
+          </button>
+          <button id="navListsBtn" type="button" class="w-full flex items-center justify-between px-3 py-2 rounded-xl fs-body font-semibold transition">
+            <span class="flex items-center gap-2.5"><i data-lucide="shopping-basket" class="w-4 h-4"></i><span>Lists</span></span>
+            <span id="drawerTotalPending" class="fs-xs px-2 py-0.5 rounded-full font-semibold" style="background-color: var(--bg-input); color: var(--text-secondary);">0</span>
+          </button>
+          <button id="navInvBtn" type="button" class="w-full flex items-center justify-between px-3 py-2 rounded-xl fs-body font-semibold transition">
+            <span class="flex items-center gap-2.5"><i data-lucide="boxes" class="w-4 h-4"></i><span>Inventory</span></span>
+            <span id="drawerInvCount" class="fs-xs px-2 py-0.5 rounded-full font-semibold" style="background-color: var(--bg-input); color: var(--text-secondary);">0</span>
+          </button>
+        </div>
+
+        <!-- Quick Notepad -->
+        <div class="flex-1 flex flex-col pt-2 border-t ios-divider min-h-[200px]">
+          <div class="flex items-center justify-between px-1 mb-1.5">
+            <span class="inline-flex items-center gap-1.5 fs-xs font-bold uppercase tracking-wider" style="color: var(--text-tertiary);">
+              <i data-lucide="sticky-note" class="w-3.5 h-3.5" style="color: var(--ios-orange);"></i>
+              <span>Notepad</span>
+            </span>
+            <button id="clearNotepadBtn" type="button" class="fs-xs font-semibold hover:opacity-75" style="color: var(--ios-red);">Clear</button>
+          </div>
+          <textarea id="drawerNotepad" placeholder="Quick notes, recipes, store reminders..." class="ios-input fs-sub flex-1 w-full rounded-xl p-2.5 resize-none leading-relaxed focus:outline-none"></textarea>
+        </div>
+      </div>
+
+      <div class="p-3 border-t ios-divider">
+        <button id="settingsBtn" type="button" class="w-full flex items-center justify-between px-3 py-2.5 rounded-xl fs-body font-semibold transition hover:opacity-90" style="background-color: var(--bg-input); color: var(--text-primary);">
+          <span class="flex items-center gap-2.5"><i data-lucide="settings" class="w-4 h-4" style="color: var(--ios-blue);"></i><span>App Settings</span></span>
+          <i data-lucide="chevron-right" class="w-4 h-4" style="color: var(--text-tertiary);"></i>
+        </button>
+      </div>
+    </aside>
+  </div>
+
+  <main class="max-w-md mx-auto px-3.5 pt-3 space-y-3">
+    <!-- Top 2 Summary Cards -->
+    <section class="grid grid-cols-2 gap-2.5" aria-label="Status summary">
+      <button id="summaryCard1" type="button" class="ios-card px-3.5 py-2.5 text-left flex items-center justify-between active:scale-[0.98] transition">
+        <div>
+          <div id="summaryCard1Label" class="fs-xs font-bold uppercase tracking-wider" style="color: var(--text-secondary);">Pending</div>
+          <div id="summaryCard1Count" class="text-xl font-bold leading-tight mt-0.5">0</div>
+        </div>
+        <div class="glass-icon-tile w-9 h-9 flex items-center justify-center text-white shrink-0" style="background-color: var(--ios-orange);">
+          <i data-lucide="clock" class="w-4 h-4"></i>
+        </div>
+      </button>
+      <button id="summaryCard2" type="button" class="ios-card px-3.5 py-2.5 text-left flex items-center justify-between active:scale-[0.98] transition">
+        <div>
+          <div id="summaryCard2Label" class="fs-xs font-bold uppercase tracking-wider" style="color: var(--text-secondary);">Closed</div>
+          <div id="summaryCard2Count" class="text-xl font-bold leading-tight mt-0.5" style="color: var(--ios-green);">0</div>
+        </div>
+        <div class="glass-icon-tile w-9 h-9 flex items-center justify-center text-white shrink-0" style="background-color: var(--ios-green);">
+          <i data-lucide="check-circle-2" class="w-4 h-4"></i>
+        </div>
+      </button>
+    </section>
+
+    <!-- ==================== VIEW 1: LISTS HOME DASHBOARD ==================== -->
+    <section id="homeView" class="space-y-3 view-enter">
+      <div class="flex items-center justify-between gap-2 px-0.5">
+        <div>
+          <h2 class="fs-title font-bold">Shopping Categories</h2>
+          <p class="fs-sub" style="color: var(--text-secondary);">Tap a category to expand its list &amp; add items</p>
+        </div>
+        <button id="homeOpenAllBtn" type="button" class="fs-sub font-semibold px-2.5 py-1 rounded-lg" style="background-color: var(--bg-card); color: var(--ios-blue); border: 0.5px solid var(--border-hairline);">All Items</button>
+      </div>
+      <div id="dashboardGrid" class="flex flex-col gap-2.5"></div>
+      <div class="flex items-center justify-between pt-1 fs-sub font-medium" style="color: var(--text-secondary);">
+        <button id="homeOpenSettingsBtn" type="button" class="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg hover:bg-black/5 dark:hover:bg-white/10 transition" style="color: var(--ios-blue);">
+          <i data-lucide="sliders-horizontal" class="w-3.5 h-3.5"></i><span>Manage Categories</span>
+        </button>
+        <button id="resetSampleBtn" type="button" class="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg hover:bg-black/5 dark:hover:bg-white/10 transition">
+          <i data-lucide="rotate-ccw" class="w-3 h-3"></i><span>Load Sample</span>
+        </button>
+      </div>
+    </section>
+
+    <!-- ==================== VIEW 2: CATEGORY LIST PAGE ==================== -->
+    <section id="listView" class="hidden space-y-3 view-enter">
+      <section class="ios-card p-2.5">
+        <form id="quickAddForm" class="space-y-2">
+          <div class="flex items-center gap-1.5">
+            <input id="itemNameInput" type="text" autocomplete="off" placeholder="Add item to this list..." class="ios-input fs-body flex-1 pl-3 pr-2.5 py-2 rounded-lg focus:outline-none" />
+            <button type="submit" class="px-3 py-2 rounded-lg text-white font-semibold fs-body flex items-center gap-1 shrink-0 active:scale-95 transition" style="background-color: var(--ios-blue);">
+              <i data-lucide="plus" class="w-3.5 h-3.5"></i><span>Add</span>
+            </button>
+          </div>
+          <div id="liveInventoryHint" class="hidden flex items-center justify-between px-2.5 py-1.5 rounded-lg fs-xs font-medium"></div>
+          <div class="flex flex-wrap items-center gap-1.5">
+            <div class="stepper-pill inline-flex items-center px-0.5 py-0.5">
+              <button id="addQtyMinus" type="button" class="stepper-btn" style="color: var(--ios-blue);"><i data-lucide="minus" class="w-3 h-3"></i></button>
+              <input id="addQtyInput" type="number" min="0.25" step="any" value="1" class="w-10 text-center bg-transparent fs-sub font-semibold focus:outline-none" />
+              <button id="addQtyPlus" type="button" class="stepper-btn" style="color: var(--ios-blue);"><i data-lucide="plus" class="w-3 h-3"></i></button>
+            </div>
+            <select id="addUnitSelect" class="ios-input fs-sub font-medium rounded-lg px-2 py-1.5 focus:outline-none"></select>
+            <select id="addCategorySelect" class="ios-input fs-sub font-medium rounded-lg px-2 py-1.5 flex-1 min-w-[105px] focus:outline-none"></select>
+          </div>
+          <div id="wishExtraFields" class="hidden space-y-1.5 pt-1 border-t ios-divider">
+            <div class="grid grid-cols-2 gap-1.5">
+              <div class="relative">
+                <span class="absolute left-2.5 top-1/2 -translate-y-1/2 fs-sub font-semibold" style="color: var(--text-tertiary);">₹</span>
+                <input id="addPriceInput" type="number" min="0" step="any" placeholder="Price" class="ios-input fs-sub w-full pl-6 pr-2 py-1.5 rounded-lg focus:outline-none" />
+              </div>
+              <select id="addWishTagSelect" class="ios-input fs-sub font-medium rounded-lg px-2 py-1.5 focus:outline-none"></select>
+            </div>
+            <input id="addLinkInput" type="url" placeholder="Product link (https://...)" class="ios-input fs-sub w-full px-2.5 py-1.5 rounded-lg focus:outline-none" />
+          </div>
+        </form>
+      </section>
+
+      <section class="space-y-2">
+        <div class="relative">
+          <i data-lucide="search" class="w-3.5 h-3.5 absolute left-2.5 top-1/2 -translate-y-1/2 pointer-events-none" style="color: var(--text-tertiary);"></i>
+          <input id="searchInput" type="search" placeholder="Search items... (swipe left → Today, right → Delete)" class="ios-input fs-sub w-full pl-8 pr-2.5 py-1.5 rounded-lg focus:outline-none" />
+        </div>
+        <div class="ios-segmented grid grid-cols-3 fs-sub font-semibold">
+          <button type="button" data-filter="all" class="ios-seg-btn active py-1 rounded-[7px]">All (<span id="countAll">0</span>)</button>
+          <button type="button" data-filter="active" class="ios-seg-btn py-1 rounded-[7px]">Pending (<span id="countActive">0</span>)</button>
+          <button type="button" data-filter="checked" class="ios-seg-btn py-1 rounded-[7px]">Closed (<span id="countChecked">0</span>)</button>
+        </div>
+      </section>
+
+      <section id="listContainer" class="space-y-3" aria-live="polite"></section>
+      <section id="emptyState" class="hidden ios-card p-6 text-center space-y-1"><h2 class="fs-body font-semibold">No items here</h2><p class="fs-sub" style="color: var(--text-secondary);">Add an item above with its quantity and unit.</p></section>
+      <section class="flex items-center justify-between pt-1 fs-sub font-medium" style="color: var(--text-secondary);">
+        <button id="clearCheckedBtn" type="button" class="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg disabled:opacity-40" style="color: var(--ios-red);"><i data-lucide="trash-2" class="w-3 h-3"></i><span>Clear Closed</span></button>
+        <span class="fs-xs" style="color: var(--text-tertiary);">Swipe ← Today · Swipe → Delete</span>
+      </section>
+    </section>
+
+    <!-- ==================== VIEW 3: INVENTORY CATEGORY DASHBOARD ==================== -->
+    <section id="invHomeView" class="hidden space-y-3 view-enter">
+      <div class="flex items-center justify-between gap-2 px-0.5">
+        <div>
+          <h2 class="fs-title font-bold">Inventory Categories</h2>
+          <p class="fs-sub" style="color: var(--text-secondary);">Tap a category to expand &amp; update stock</p>
+        </div>
+        <button id="invOpenAllBtn" type="button" class="fs-sub font-semibold px-2.5 py-1 rounded-lg" style="background-color: var(--bg-card); color: var(--ios-green); border: 0.5px solid var(--border-hairline);">All Stock</button>
+      </div>
+      <div id="invDashboardGrid" class="flex flex-col gap-2.5"></div>
+    </section>
+
+    <!-- ==================== VIEW 4: INVENTORY CATEGORY LIST PAGE ==================== -->
+    <section id="invListView" class="hidden space-y-3 view-enter">
+      <section class="ios-card p-2.5">
+        <form id="invAddForm" class="space-y-2">
+          <div class="flex items-center gap-1.5">
+            <input id="invNameInput" type="text" autocomplete="off" placeholder="Add item to home inventory..." class="ios-input fs-body flex-1 pl-3 pr-2.5 py-2 rounded-lg focus:outline-none" />
+            <button type="submit" class="px-3 py-2 rounded-lg text-white font-semibold fs-body flex items-center gap-1 shrink-0 active:scale-95 transition" style="background-color: var(--ios-green);">
+              <i data-lucide="plus" class="w-3.5 h-3.5"></i><span>Add</span>
+            </button>
+          </div>
+          <div class="flex flex-wrap items-center gap-1.5">
+            <div class="stepper-pill inline-flex items-center px-0.5 py-0.5">
+              <button id="invQtyMinus" type="button" class="stepper-btn" style="color: var(--ios-blue);"><i data-lucide="minus" class="w-3 h-3"></i></button>
+              <input id="invQtyInput" type="number" min="0" step="any" value="1" class="w-10 text-center bg-transparent fs-sub font-semibold focus:outline-none" />
+              <button id="invQtyPlus" type="button" class="stepper-btn" style="color: var(--ios-blue);"><i data-lucide="plus" class="w-3 h-3"></i></button>
+            </div>
+            <select id="invUnitSelect" class="ios-input fs-sub font-medium rounded-lg px-2 py-1.5 focus:outline-none"></select>
+            <select id="invCategorySelect" class="ios-input fs-sub font-medium rounded-lg px-2 py-1.5 flex-1 min-w-[105px] focus:outline-none"></select>
+          </div>
+        </form>
+      </section>
+      <div class="relative">
+        <i data-lucide="search" class="w-3.5 h-3.5 absolute left-2.5 top-1/2 -translate-y-1/2 pointer-events-none" style="color: var(--text-tertiary);"></i>
+        <input id="invSearchInput" type="search" placeholder="Search stock..." class="ios-input fs-sub w-full pl-8 pr-2.5 py-1.5 rounded-lg focus:outline-none" />
+      </div>
+      <section id="inventoryContainer" class="space-y-3" aria-live="polite"></section>
+      <section id="invEmptyState" class="hidden ios-card p-6 text-center space-y-1"><h2 class="fs-body font-semibold">No stock in this category</h2><p class="fs-sub" style="color: var(--text-secondary);">Add items above to track current home quantity.</p></section>
+    </section>
+
+    <!-- ==================== VIEW 5: TO-DO LIST PAGE ==================== -->
+    <section id="todoView" class="hidden space-y-3 view-enter">
+      <section class="ios-card p-2.5">
+        <form id="todoAddForm" class="space-y-2">
+          <div class="flex items-center gap-1.5">
+            <input id="todoTitleInput" type="text" autocomplete="off" placeholder="Add a to-do task..." class="ios-input fs-body flex-1 pl-3 pr-2.5 py-2 rounded-lg focus:outline-none" />
+            <button type="submit" class="px-3 py-2 rounded-lg text-white font-semibold fs-body flex items-center gap-1 shrink-0 active:scale-95 transition" style="background-color: var(--ios-blue);">
+              <i data-lucide="plus" class="w-3.5 h-3.5"></i><span>Add</span>
+            </button>
+          </div>
+          <div class="grid grid-cols-2 gap-1.5">
+            <select id="todoPrioritySelect" class="ios-input fs-sub font-medium rounded-lg px-2 py-1.5 focus:outline-none">
+              <option value="Normal">Priority: Normal</option><option value="High">Priority: High</option><option value="Low">Priority: Low</option>
+            </select>
+            <input id="todoDueInput" type="text" maxlength="24" placeholder="Due (e.g. Today, Fri)" class="ios-input fs-sub px-2.5 py-1.5 rounded-lg focus:outline-none" />
+          </div>
+        </form>
+      </section>
+      <div class="ios-segmented grid grid-cols-3 fs-sub font-semibold">
+        <button type="button" data-todo-filter="all" class="ios-seg-btn active py-1 rounded-[7px]">All (<span id="todoCountAll">0</span>)</button>
+        <button type="button" data-todo-filter="active" class="ios-seg-btn py-1 rounded-[7px]">Pending (<span id="todoCountActive">0</span>)</button>
+        <button type="button" data-todo-filter="checked" class="ios-seg-btn py-1 rounded-[7px]">Closed (<span id="todoCountChecked">0</span>)</button>
+      </div>
+      <section id="todoContainer" class="space-y-2.5" aria-live="polite"></section>
+      <section id="todoEmptyState" class="hidden ios-card p-6 text-center space-y-1"><h2 class="fs-body font-semibold">No to-do tasks</h2><p class="fs-sub" style="color: var(--text-secondary);">Add a task above, then swipe left to push it to Today.</p></section>
+      <section class="flex items-center justify-between pt-1 fs-sub font-medium" style="color: var(--text-secondary);">
+        <button id="clearTodoClosedBtn" type="button" class="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg disabled:opacity-40" style="color: var(--ios-red);"><i data-lucide="trash-2" class="w-3 h-3"></i><span>Clear Closed</span></button>
+        <span class="fs-xs" style="color: var(--text-tertiary);">Swipe ← Today · Swipe → Delete</span>
+      </section>
+    </section>
+
+    <!-- ==================== VIEW 6: FOR TODAY PAGE (2 Expandable Sections) ==================== -->
+    <section id="todayView" class="hidden space-y-3 view-enter">
+      <div class="px-0.5">
+        <h2 class="fs-title font-bold">Today</h2>
+        <p class="fs-sub" style="color: var(--text-secondary);">Items &amp; tasks you swiped left into today's focus</p>
+      </div>
+
+      <!-- Expandable Section 1: Shopping List -->
+      <div class="ios-card overflow-hidden">
+        <button id="toggleTodayListSec" type="button" class="w-full px-3.5 py-3 flex items-center justify-between text-left transition">
+          <div class="flex items-center gap-2.5">
+            <div class="glass-icon-tile w-9 h-9 flex items-center justify-center text-white shrink-0" style="background-color: var(--ios-blue);">
+              <i data-lucide="shopping-basket" class="w-4 h-4"></i>
+            </div>
+            <div>
+              <div class="fs-body font-bold">Shopping List</div>
+              <div id="todayListSub" class="fs-xs" style="color: var(--text-secondary);">0 pending today</div>
+            </div>
+          </div>
+          <div class="flex items-center gap-2">
+            <span id="todayListBadge" class="fs-xs font-bold px-2 py-0.5 rounded-full" style="background-color: var(--bg-input); color: var(--text-primary);">0</span>
+            <i id="todayListChev" data-lucide="chevron-down" class="w-4 h-4 transition-transform duration-200" style="color: var(--text-tertiary);"></i>
+          </div>
+        </button>
+        <div id="todayListBody" class="border-t ios-divider"></div>
+      </div>
+
+      <!-- Expandable Section 2: Tasks -->
+      <div class="ios-card overflow-hidden">
+        <button id="toggleTodayTaskSec" type="button" class="w-full px-3.5 py-3 flex items-center justify-between text-left transition">
+          <div class="flex items-center gap-2.5">
+            <div class="glass-icon-tile w-9 h-9 flex items-center justify-center text-white shrink-0" style="background-color: #5856D6;">
+              <i data-lucide="check-square" class="w-4 h-4"></i>
+            </div>
+            <div>
+              <div class="fs-body font-bold">Tasks</div>
+              <div id="todayTaskSub" class="fs-xs" style="color: var(--text-secondary);">0 pending today</div>
+            </div>
+          </div>
+          <div class="flex items-center gap-2">
+            <span id="todayTaskBadge" class="fs-xs font-bold px-2 py-0.5 rounded-full" style="background-color: var(--bg-input); color: var(--text-primary);">0</span>
+            <i id="todayTaskChev" data-lucide="chevron-down" class="w-4 h-4 transition-transform duration-200" style="color: var(--text-tertiary);"></i>
+          </div>
+        </button>
+        <div id="todayTaskBody" class="border-t ios-divider"></div>
+      </div>
+
+      <p class="text-center fs-xs pt-1" style="color: var(--text-tertiary);">Tip: Swipe left on any item here to remove from Today, or swipe right to delete.</p>
+    </section>
+  </main>
+
+  <!-- Hidden native iOS Safari Taptic Engine Haptic Switch (iOS 17.4+ / 18 / 26) -->
+  <label id="iosHapticLabel" aria-hidden="true" style="position:fixed;left:-9999px;top:-9999px;width:1px;height:1px;opacity:0;pointer-events:none;overflow:hidden;">
+    <input id="iosHapticSwitch" type="checkbox" switch tabindex="-1" />
+  </label>
+
+  <!-- Floating Apple iOS 26 Clear Liquid Glass Loupe Slider (4 Tabs) -->
+  <nav class="island-wrap" aria-label="Main sections">
+    <div id="islandDock" class="island-dock">
+      <div id="islandLens" class="island-lens"></div>
+      <div id="islandLoupe" class="island-loupe" aria-hidden="true">
+        <div id="islandLoupeTrack" class="island-loupe-track">
+          <div data-loupe-idx="0" class="island-tab">
+            <i data-lucide="sun" class="w-4 h-4"></i>
+            <span>Today</span>
+          </div>
+          <div data-loupe-idx="1" class="island-tab">
+            <i data-lucide="check-square" class="w-4 h-4"></i>
+            <span>To-Do</span>
+          </div>
+          <div data-loupe-idx="2" class="island-tab active">
+            <i data-lucide="shopping-basket" class="w-4 h-4"></i>
+            <span>Lists</span>
+          </div>
+          <div data-loupe-idx="3" class="island-tab">
+            <i data-lucide="boxes" class="w-4 h-4"></i>
+            <span>Inventory</span>
+          </div>
+        </div>
+      </div>
+      <button type="button" data-island-idx="0" class="island-tab">
+        <i data-lucide="sun" class="w-4 h-4"></i>
+        <span>Today</span>
+      </button>
+      <button type="button" data-island-idx="1" class="island-tab">
+        <i data-lucide="check-square" class="w-4 h-4"></i>
+        <span>To-Do</span>
+      </button>
+      <button type="button" data-island-idx="2" class="island-tab active">
+        <i data-lucide="shopping-basket" class="w-4 h-4"></i>
+        <span>Lists</span>
+      </button>
+      <button type="button" data-island-idx="3" class="island-tab">
+        <i data-lucide="boxes" class="w-4 h-4"></i>
+        <span>Inventory</span>
+      </button>
+    </div>
+  </nav>
+
+  <!-- Settings Modal -->
+  <div id="settingsModal" class="hidden fixed inset-0 z-50 modal-backdrop flex items-end sm:items-center justify-center p-0 sm:p-4">
+    <div class="ios-card animate-sheet w-full max-w-md max-h-[88dvh] overflow-y-auto rounded-b-none sm:rounded-2xl p-4 space-y-4 shadow-2xl">
+      <div class="ios-grabber sm:hidden"></div>
+      <div class="flex items-center justify-between sticky top-0 pb-2 border-b ios-divider z-10" style="background-color: var(--bg-card);">
+        <div class="flex items-center gap-1.5"><i data-lucide="settings" class="w-4 h-4" style="color: var(--ios-blue);"></i><h2 class="fs-title font-bold">App Settings</h2></div>
+        <button id="closeSettingsModal" type="button" class="p-1 rounded-full" style="background-color: var(--bg-input); color: var(--text-secondary);"><i data-lucide="x" class="w-3.5 h-3.5"></i></button>
+      </div>
+      <div class="space-y-1.5">
+        <label class="block fs-xs font-bold uppercase tracking-wider" style="color: var(--text-secondary);">Font Size</label>
+        <div class="ios-segmented grid grid-cols-3 fs-sub font-semibold" id="fontSizePicker">
+          <button type="button" data-font-opt="small" class="ios-seg-btn py-1.5 rounded-[7px]">Small</button>
+          <button type="button" data-font-opt="medium" class="ios-seg-btn py-1.5 rounded-[7px]">Medium</button>
+          <button type="button" data-font-opt="large" class="ios-seg-btn py-1.5 rounded-[7px]">Large</button>
+        </div>
+      </div>
+      <div class="space-y-1.5 pt-2 border-t ios-divider">
+        <label class="block fs-xs font-bold uppercase tracking-wider" style="color: var(--text-secondary);">Theme Color</label>
+        <div id="themeColorPicker" class="flex flex-wrap items-center gap-2.5"></div>
+      </div>
+      <div class="space-y-1.5 pt-2 border-t ios-divider">
+        <label class="block fs-xs font-bold uppercase tracking-wider" style="color: var(--text-secondary);">App Icon</label>
+        <div id="appIconPicker" class="grid grid-cols-6 gap-2"></div>
+      </div>
+      <div class="space-y-2 pt-2 border-t ios-divider">
+        <label class="block fs-xs font-bold uppercase tracking-wider" style="color: var(--text-secondary);">Categories (Add / Remove)</label>
+        <div id="settingsCategoriesList" class="flex flex-wrap gap-1.5"></div>
+        <form id="settingsAddCatForm" class="space-y-2 pt-1">
+          <div class="flex items-center gap-1.5">
+            <input id="settingsCatNameInput" type="text" maxlength="28" placeholder="New category..." class="ios-input fs-sub flex-1 px-2.5 py-1.5 rounded-lg focus:outline-none" />
+            <button type="submit" class="px-3 py-1.5 rounded-lg text-white font-semibold fs-sub shrink-0" style="background-color: var(--ios-blue);">Add</button>
+          </div>
+          <div id="settingsCatColors" class="flex items-center gap-2"></div>
+        </form>
+      </div>
+      <div class="space-y-2 pt-2 border-t ios-divider">
+        <div class="flex items-center justify-between">
+          <label class="block fs-xs font-bold uppercase tracking-wider" style="color: var(--text-secondary);">Quantity Units</label>
+          <div class="flex items-center gap-1.5"><span class="fs-xs" style="color: var(--text-secondary);">Default:</span><select id="defaultUnitSelect" class="ios-input fs-xs font-semibold rounded-md px-2 py-1 focus:outline-none"></select></div>
+        </div>
+        <div id="settingsUnitsList" class="flex flex-wrap gap-1.5"></div>
+        <form id="addUnitForm" class="flex items-center gap-1.5 pt-1">
+          <input id="newUnitNameInput" type="text" maxlength="14" placeholder="Add unit..." class="ios-input fs-sub flex-1 px-2.5 py-1.5 rounded-lg focus:outline-none" />
+          <input id="newUnitStepInput" type="number" min="0.1" step="any" value="1" class="ios-input fs-sub w-14 px-2 py-1.5 rounded-lg text-center focus:outline-none" />
+          <button type="submit" class="px-3 py-1.5 rounded-lg text-white font-semibold fs-sub shrink-0" style="background-color: var(--ios-blue);">Add</button>
+        </form>
+      </div>
+      <button id="doneSettingsBtn" type="button" class="w-full py-2 rounded-lg text-white font-semibold fs-body" style="background-color: var(--ios-blue);">Done</button>
+    </div>
+  </div>
+
+  <!-- Edit Item Modal -->
+  <div id="editModal" class="hidden fixed inset-0 z-50 modal-backdrop flex items-end sm:items-center justify-center p-0 sm:p-4">
+    <div class="ios-card animate-sheet w-full max-w-sm rounded-b-none sm:rounded-2xl p-4 space-y-3 shadow-2xl">
+      <div class="ios-grabber sm:hidden"></div>
+      <div class="flex items-center justify-between">
+        <h2 id="editModalTitle" class="fs-title font-bold">Edit Item</h2>
+        <button id="closeEditModal" type="button" class="p-1 rounded-full" style="background-color: var(--bg-input); color: var(--text-secondary);"><i data-lucide="x" class="w-3.5 h-3.5"></i></button>
+      </div>
+      <form id="editItemForm" class="space-y-3">
+        <input type="hidden" id="editItemId" /><input type="hidden" id="editItemTarget" value="list" />
+        <div><label for="editItemName" class="block fs-xs font-semibold uppercase tracking-wider mb-1" style="color: var(--text-secondary);">Item Name</label><input id="editItemName" type="text" required class="ios-input fs-body w-full px-3 py-2 rounded-lg focus:outline-none" /></div>
+        <div class="grid grid-cols-2 gap-2.5">
+          <div><label for="editItemQty" class="block fs-xs font-semibold uppercase tracking-wider mb-1" style="color: var(--text-secondary);">Quantity</label><input id="editItemQty" type="number" min="0" step="any" required class="ios-input fs-body w-full px-3 py-2 rounded-lg focus:outline-none" /></div>
+          <div><label for="editItemUnit" class="block fs-xs font-semibold uppercase tracking-wider mb-1" style="color: var(--text-secondary);">Unit</label><select id="editItemUnit" class="ios-input fs-body w-full px-2.5 py-2 rounded-lg focus:outline-none"></select></div>
+        </div>
+        <div><label for="editItemCategory" class="block fs-xs font-semibold uppercase tracking-wider mb-1" style="color: var(--text-secondary);">Category</label><select id="editItemCategory" class="ios-input fs-body w-full px-2.5 py-2 rounded-lg focus:outline-none"></select></div>
+        <div id="editWishFields" class="hidden space-y-2 pt-1 border-t ios-divider">
+          <div class="grid grid-cols-2 gap-2">
+            <div><label for="editItemPrice" class="block fs-xs font-semibold uppercase tracking-wider mb-1" style="color: var(--text-secondary);">Price (₹)</label><input id="editItemPrice" type="number" min="0" step="any" class="ios-input fs-body w-full px-3 py-2 rounded-lg focus:outline-none" /></div>
+            <div><label for="editItemWishTag" class="block fs-xs font-semibold uppercase tracking-wider mb-1" style="color: var(--text-secondary);">Tag</label><select id="editItemWishTag" class="ios-input fs-body w-full px-2 py-2 rounded-lg focus:outline-none"></select></div>
+          </div>
+          <div><label for="editItemLink" class="block fs-xs font-semibold uppercase tracking-wider mb-1" style="color: var(--text-secondary);">Product Link</label><input id="editItemLink" type="url" placeholder="https://..." class="ios-input fs-sub w-full px-3 py-2 rounded-lg focus:outline-none" /></div>
+        </div>
+        <div><label for="editItemNote" class="block fs-xs font-semibold uppercase tracking-wider mb-1" style="color: var(--text-secondary);">Note</label><input id="editItemNote" type="text" class="ios-input fs-sub w-full px-3 py-2 rounded-lg focus:outline-none" /></div>
+        <div class="flex items-center gap-2 pt-1">
+          <button id="deleteItemModalBtn" type="button" class="px-3.5 py-2 rounded-lg font-semibold fs-sub" style="background-color: rgba(255,59,48,0.12); color: var(--ios-red);">Delete</button>
+          <button type="submit" class="flex-1 py-2 rounded-lg text-white font-semibold fs-sub" style="background-color: var(--ios-blue);">Save Changes</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Toast Banner -->
+  <div id="toast" class="fixed bottom-24 left-1/2 -translate-x-1/2 z-50 hidden">
+    <div class="px-3.5 py-2 rounded-full shadow-lg flex items-center gap-2.5 fs-sub font-medium text-white bg-zinc-900/95 dark:bg-zinc-800 border border-white/10">
+      <span id="toastMessage">Saved</span>
+      <button id="toastUndoBtn" type="button" class="hidden font-bold text-blue-400">Undo</button>
+    </div>
+  </div>
+
+  <script>
+    (function () {
+      const STORAGE_KEY = 'freshcart_ios_multilist_v7';
+      const INV_KEY = 'freshcart_ios_inventory_v7';
+      const TODO_KEY = 'freshcart_ios_todos_v7';
+      const LISTS_KEY = 'freshcart_ios_custom_lists_v7';
+      const SETTINGS_KEY = 'freshcart_ios_settings_v7';
+      const NOTEPAD_KEY = 'freshcart_ios_notepad_v7';
+      const THEME_KEY = 'freshcart_ios_theme_v1';
+
+      const DEFAULT_CATEGORIES = [
+        { name: 'Food', color: '#34C759', icon: 'apple' },
+        { name: 'Daily Essentials', color: '#007AFF', icon: 'sparkles' },
+        { name: 'Clothes', color: '#AF52DE', icon: 'shirt' },
+        { name: 'Electronics', color: '#5856D6', icon: 'cpu' },
+        { name: 'Accessories', color: '#FF9500', icon: 'watch' },
+        { name: 'Wish List', color: '#FF2D55', icon: 'heart' }
+      ];
+      const DEFAULT_UNITS = [
+        { name: 'numbers', step: 1 }, { name: 'Kg', step: 0.5 }, { name: 'gm', step: 100 },
+        { name: 'Liters', step: 0.5 }, { name: 'box', step: 1 }, { name: 'packets', step: 1 },
+        { name: 'ml', step: 100 }, { name: 'dozen', step: 1 }, { name: 'bottle', step: 1 }, { name: 'pair', step: 1 }
+      ];
+      const THEME_COLORS = ['#007AFF', '#34C759', '#5856D6', '#AF52DE', '#FF9500', '#FF2D55', '#00C7BE', '#475569'];
+      const APP_ICONS = [
+        { id: 'shopping-basket', label: 'Basket' }, { id: 'shopping-cart', label: 'Cart' },
+        { id: 'shopping-bag', label: 'Bag' }, { id: 'list-checks', label: 'List' },
+        { id: 'package', label: 'Box' }, { id: 'heart', label: 'Heart' }
+      ];
+      const ACCENT_PALETTE = ['#34C759', '#007AFF', '#AF52DE', '#5856D6', '#FF9500', '#FF2D55', '#00C7BE', '#FF3B30'];
+
+      const SAMPLE_ITEMS = [
+        { id: 's1', name: 'Fresh Milk', qty: 2, unit: 'Liters', category: 'Food', note: 'Full cream', checked: false, forToday: true },
+        { id: 's2', name: 'Tomatoes', qty: 1, unit: 'Kg', category: 'Food', note: 'Firm & ripe', checked: false, forToday: true },
+        { id: 's3', name: 'Green Chillies', qty: 250, unit: 'gm', category: 'Food', note: '', checked: false, forToday: false },
+        { id: 's4', name: 'Basmati Rice', qty: 1, unit: 'packets', category: 'Food', note: '5 Kg pack', checked: true, forToday: false },
+        { id: 's5', name: 'Dishwashing Liquid', qty: 1, unit: 'bottle', category: 'Daily Essentials', note: 'Lemon scent', checked: false, forToday: false },
+        { id: 's6', name: 'Tissue Box', qty: 2, unit: 'box', category: 'Daily Essentials', note: '', checked: true, forToday: false },
+        { id: 's7', name: 'Crew Socks', qty: 3, unit: 'pair', category: 'Clothes', note: 'Black / grey', checked: false, forToday: false },
+        { id: 's8', name: 'USB-C Fast Cable', qty: 2, unit: 'numbers', category: 'Electronics', note: '2m braided', checked: false, forToday: false },
+        { id: 's9', name: 'MagSafe Phone Case', qty: 1, unit: 'numbers', category: 'Accessories', note: 'Clear matte', checked: false, forToday: false },
+        { id: 's10', name: 'Noise-Canceling Headphones', qty: 1, unit: 'box', category: 'Wish List', note: 'Wait for sale', checked: false, forToday: false, price: 24990, wishTag: 'Electronics', link: 'https://www.sony.co.in' }
+      ];
+
+      const SAMPLE_INVENTORY = [
+        { id: 'inv1', name: 'Fresh Milk', qty: 0.5, unit: 'Liters', category: 'Food', note: 'Fridge door' },
+        { id: 'inv2', name: 'Tomatoes', qty: 0.5, unit: 'Kg', category: 'Food', note: 'Crisper drawer' },
+        { id: 'inv3', name: 'Basmati Rice', qty: 3, unit: 'Kg', category: 'Food', note: 'Pantry jar' },
+        { id: 'inv4', name: 'Dishwashing Liquid', qty: 0.5, unit: 'bottle', category: 'Daily Essentials', note: 'Under sink' },
+        { id: 'inv5', name: 'Toothpaste', qty: 2, unit: 'box', category: 'Daily Essentials', note: 'Cabinet' },
+        { id: 'inv6', name: 'Crew Socks', qty: 5, unit: 'pair', category: 'Clothes', note: 'Top drawer' },
+        { id: 'inv7', name: 'USB-C Fast Cable', qty: 1, unit: 'numbers', category: 'Electronics', note: 'Desk drawer' }
+      ];
+
+      const SAMPLE_TODOS = [
+        { id: 't1', title: 'Pay electricity bill', priority: 'High', due: 'Today', done: false, forToday: true },
+        { id: 't2', title: 'Pick up dry cleaning', priority: 'Normal', due: 'Tomorrow', done: false, forToday: false },
+        { id: 't3', title: 'Refill kitchen water filter', priority: 'Low', due: 'This week', done: false, forToday: true },
+        { id: 't4', title: 'Order phone screen guard', priority: 'Normal', due: 'Done', done: true, forToday: false }
+      ];
+
+      let state = {
+        view: 'home', // 'home' | 'list' | 'invHome' | 'invList' | 'todo' | 'today'
+        activeList: 'All',
+        activeInvCat: 'All',
+        categories: [],
+        items: [],
+        inventory: [],
+        todos: [],
+        settings: { fontSize: 'small', themeColor: '#007AFF', appIcon: 'shopping-basket', defaultUnit: 'numbers', units: [] },
+        filter: 'all',
+        todoFilter: 'all',
+        search: '',
+        invSearch: '',
+        todayListOpen: true,
+        todayTaskOpen: true,
+        openListCats: {},
+        openInvCats: {},
+        selectedNewColor: ACCENT_PALETTE[0],
+        lastUndo: null
+      };
+
+      let toastTimer = null;
+
+      function loadJSON(k, fb) { try { const r = localStorage.getItem(k); if (r) { const p = JSON.parse(r); if (Array.isArray(p)) return p; } } catch (e) {} return fb.map(x => ({ ...x })); }
+      function loadSettings() { try { const r = localStorage.getItem(SETTINGS_KEY); if (r) { const p = JSON.parse(r); if (p && Array.isArray(p.units) && p.units.length) return { fontSize: p.fontSize || 'small', themeColor: p.themeColor || '#007AFF', appIcon: p.appIcon || 'shopping-basket', defaultUnit: p.defaultUnit || p.units[0].name, units: p.units }; } } catch (e) {} return { fontSize: 'small', themeColor: '#007AFF', appIcon: 'shopping-basket', defaultUnit: 'numbers', units: DEFAULT_UNITS.map(u => ({ ...u })) }; }
+      function saveAll() { try { localStorage.setItem(LISTS_KEY, JSON.stringify(state.categories)); localStorage.setItem(STORAGE_KEY, JSON.stringify(state.items)); localStorage.setItem(INV_KEY, JSON.stringify(state.inventory)); localStorage.setItem(TODO_KEY, JSON.stringify(state.todos)); localStorage.setItem(SETTINGS_KEY, JSON.stringify(state.settings)); } catch (e) {} }
+
+      function getCatMeta(n) { return state.categories.find(c => c.name === n) || { name: n, color: '#8E8E93', icon: 'folder' }; }
+      function fmtQty(v) { const n = Number(v); return Number.isFinite(n) ? (Number.isInteger(n) ? String(n) : String(Number(n.toFixed(2)))) : '0'; }
+      function stepDelta(u) { const f = state.settings.units.find(x => x.name.toLowerCase() === String(u).toLowerCase()); return (f && Number(f.step) > 0) ? Number(f.step) : 1; }
+      function esc(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;'); }
+      function normUrl(r) { const s = String(r || '').trim(); return !s ? '' : (/^https?:\/\//i.test(s) ? s : 'https://' + s); }
+      function fmtPrice(v) { const n = Number(v); return (Number.isFinite(n) && n > 0) ? ('₹' + n.toLocaleString('en-IN', { maximumFractionDigits: 2 })) : ''; }
+      function refreshIcons() { if (window.lucide && typeof window.lucide.createIcons === 'function') window.lucide.createIcons(); }
+      function haptic(style) {
+        try {
+          const lbl = document.getElementById('iosHapticLabel');
+          if (lbl) lbl.click();
+        } catch (e) {}
+        try {
+          if (navigator.vibrate) navigator.vibrate(style === 'tick' ? 6 : style === 'heavy' ? 16 : 10);
+        } catch (e) {}
+      }
+      function findInv(name) { const c = name.trim().toLowerCase(); if (!c) return null; return state.inventory.find(i => i.name.toLowerCase() === c) || state.inventory.find(i => i.name.toLowerCase().includes(c) || c.includes(i.name.toLowerCase())); }
+
+      function showToast(msg, undoFn) {
+        document.getElementById('toastMessage').textContent = msg;
+        state.lastUndo = undoFn || null;
+        document.getElementById('toastUndoBtn').classList.toggle('hidden', !undoFn);
+        document.getElementById('toast').classList.remove('hidden');
+        clearTimeout(toastTimer);
+        toastTimer = setTimeout(() => { document.getElementById('toast').classList.add('hidden'); state.lastUndo = null; }, 3500);
+      }
+
+      function applyFontSize(sz) { state.settings.fontSize = sz; document.documentElement.setAttribute('data-font-size', sz); saveAll(); document.querySelectorAll('[data-font-opt]').forEach(b => b.classList.toggle('active', b.dataset.fontOpt === sz)); }
+      function applyThemeColor(hex) { state.settings.themeColor = hex; document.documentElement.style.setProperty('--ios-blue', hex); saveAll(); render(); }
+      function applyTheme(dark) {
+        document.documentElement.classList.toggle('dark', dark);
+        const m = document.querySelector('meta[name="theme-color"]'); if (m) m.setAttribute('content', dark ? '#000000' : '#F2F2F7');
+        const btn = document.getElementById('themeToggleBtn'); if (btn) btn.innerHTML = dark ? '<i data-lucide="sun" class="w-4 h-4"></i>' : '<i data-lucide="moon" class="w-4 h-4"></i>';
+        try { localStorage.setItem(THEME_KEY, dark ? 'dark' : 'light'); } catch (e) {}
+        refreshIcons();
+      }
+
+      function openDrawer() { const o = document.getElementById('drawerOverlay'); o.classList.remove('hidden'); requestAnimationFrame(() => o.classList.add('drawer-open')); }
+      function closeDrawer() { const o = document.getElementById('drawerOverlay'); o.classList.remove('drawer-open'); setTimeout(() => o.classList.add('hidden'), 220); }
+
+      // ==================== PER-TAB NAVIGATION & SCROLL MEMORY ====================
+      const navMemory = {
+        tabView: { 0: 'today', 1: 'todo', 2: 'home', 3: 'invHome' },
+        scroll: { today: 0, todo: 0, home: 0, invHome: 0, list: {}, invList: {} }
+      };
+
+      function getScrollKey() {
+        if (state.view === 'list') return ['list', state.activeList || 'All'];
+        if (state.view === 'invList') return ['invList', state.activeInvCat || 'All'];
+        return [state.view, null];
+      }
+
+      function saveCurrentNavState() {
+        const y = window.scrollY || window.pageYOffset || 0;
+        const [k, sub] = getScrollKey();
+        if (sub !== null) navMemory.scroll[k][sub] = y;
+        else navMemory.scroll[k] = y;
+        navMemory.tabView[activeIslandIndex()] = state.view;
+      }
+
+      function restoreCurrentScroll(forceTop) {
+        if (forceTop) {
+          requestAnimationFrame(() => window.scrollTo(0, 0));
+          return;
+        }
+        const [k, sub] = getScrollKey();
+        const y = sub !== null ? (navMemory.scroll[k][sub] || 0) : (navMemory.scroll[k] || 0);
+        requestAnimationFrame(() => window.scrollTo(0, y));
+      }
+
+      function goHome(forceTop) {
+        saveCurrentNavState();
+        state.view = 'home';
+        navMemory.tabView[2] = 'home';
+        closeDrawer();
+        render();
+        restoreCurrentScroll(forceTop);
+      }
+      function goList(cat, preserveState) {
+        saveCurrentNavState();
+        state.view = 'list';
+        navMemory.tabView[2] = 'list';
+        if (!preserveState) {
+          state.activeList = cat;
+          state.filter = 'all';
+          state.search = '';
+          document.getElementById('searchInput').value = '';
+        } else {
+          document.getElementById('searchInput').value = state.search || '';
+        }
+        syncCategorySelects();
+        closeDrawer();
+        render();
+        restoreCurrentScroll(false);
+      }
+      function goInvHome(forceTop) {
+        saveCurrentNavState();
+        state.view = 'invHome';
+        navMemory.tabView[3] = 'invHome';
+        closeDrawer();
+        render();
+        restoreCurrentScroll(forceTop);
+      }
+      function goInvList(cat, preserveState) {
+        saveCurrentNavState();
+        state.view = 'invList';
+        navMemory.tabView[3] = 'invList';
+        if (!preserveState) {
+          state.activeInvCat = cat;
+          state.invSearch = '';
+          document.getElementById('invSearchInput').value = '';
+        } else {
+          document.getElementById('invSearchInput').value = state.invSearch || '';
+        }
+        syncCategorySelects();
+        closeDrawer();
+        render();
+        restoreCurrentScroll(false);
+      }
+      function goTodo() {
+        saveCurrentNavState();
+        state.view = 'todo';
+        navMemory.tabView[1] = 'todo';
+        closeDrawer();
+        render();
+        restoreCurrentScroll(false);
+      }
+      function goToday() {
+        saveCurrentNavState();
+        state.view = 'today';
+        navMemory.tabView[0] = 'today';
+        closeDrawer();
+        render();
+        restoreCurrentScroll(false);
+      }
+
+      function restoreTab(idx, isSameTabTap) {
+        const curIdx = activeIslandIndex();
+        if (isSameTabTap && idx === curIdx) {
+          if (idx === 2 && state.view === 'list') { goHome(true); return; }
+          if (idx === 3 && state.view === 'invList') { goInvHome(true); return; }
+          try { window.scrollTo({ top: 0, behavior: 'smooth' }); } catch (e) { window.scrollTo(0, 0); }
+          return;
+        }
+        const savedView = navMemory.tabView[idx];
+        if (idx === 0) goToday();
+        else if (idx === 1) goTodo();
+        else if (idx === 2) {
+          if (savedView === 'list' && state.activeList) goList(state.activeList, true);
+          else goHome(false);
+        } else {
+          if (savedView === 'invList' && state.activeInvCat) goInvList(state.activeInvCat, true);
+          else goInvHome(false);
+        }
+      }
+
+      function activeIslandIndex() {
+        if (state.view === 'today') return 0;
+        if (state.view === 'todo') return 1;
+        if (state.view === 'invHome' || state.view === 'invList') return 3;
+        return 2; // 'home' or 'list'
+      }
+
+      // ==================== 120Hz GPU-COMPOSITED LIQUID GLASS SLIDER ENGINE ====================
+      const dockEl = document.getElementById('islandDock');
+      const lensEl = document.getElementById('islandLens');
+      const loupeEl = document.getElementById('islandLoupe');
+      const loupeTrackEl = document.getElementById('islandLoupeTrack');
+      const dockTabs = Array.from(document.querySelectorAll('[data-island-idx]'));
+      const loupeTabs = Array.from(document.querySelectorAll('[data-loupe-idx]'));
+
+      let dockMetrics = null;
+      const sliderPhys = {
+        curPct: 200,
+        targetPct: 200,
+        sx: 1,
+        sy: 1,
+        loupeScale: 0.88,
+        dragging: false,
+        gliding: false,
+        rafId: null,
+        lastT: 0,
+        lastVisualIdx: 2
+      };
+
+      function measureDock() {
+        if (!dockEl || !loupeEl || !loupeTrackEl) return null;
+        const r = dockEl.getBoundingClientRect();
+        if (!r.width || !r.height) return null;
+        const pad = 5;
+        const trackW = r.width - pad * 2;
+        const trackH = r.height - pad * 2;
+        const segW = trackW / 4;
+        const loupeW = segW * 1.16;
+        const loupeH = r.height + 20;
+        dockMetrics = { left: r.left, width: r.width, height: r.height, pad, trackW, trackH, segW, loupeW, loupeH, mag: 1.24 };
+        // Apply static dimensions ONCE (never during pointermove / rAF!)
+        loupeEl.style.width = loupeW.toFixed(2) + 'px';
+        loupeTrackEl.style.width = trackW.toFixed(2) + 'px';
+        loupeTrackEl.style.height = trackH.toFixed(2) + 'px';
+        return dockMetrics;
+      }
+
+      function applySliderFrame(pct, isMagnifying, sx, sy) {
+        const m = dockMetrics || measureDock();
+        if (!m) return;
+
+        // 1. Resting 10% fogged pill (pure GPU translate3d)
+        if (lensEl) {
+          const lensX = (pct / 100) * m.segW;
+          lensEl.style.transform = `translate3d(${lensX.toFixed(2)}px, 0, 0)`;
+        }
+
+        // 2. Toggle magnifying class only when state flips
+        if (dockEl) {
+          const hasMag = dockEl.classList.contains('magnifying');
+          if (hasMag !== isMagnifying) dockEl.classList.toggle('magnifying', isMagnifying);
+        }
+
+        // 3. Overhanging etched magnifying loupe + pixel-synced 1.24x track (pure GPU translate3d + scale)
+        const centerXInTrack = (pct / 100) * m.segW + m.segW * 0.5;
+        const loupeLeft = m.pad + centerXInTrack - m.loupeW * 0.5;
+        const scaleX = isMagnifying ? sx : 0.88;
+        const scaleY = isMagnifying ? sy : 0.78;
+        if (loupeEl) {
+          loupeEl.style.transform = `translate3d(${loupeLeft.toFixed(2)}px, 0, 0) scale(${scaleX.toFixed(3)}, ${scaleY.toFixed(3)})`;
+        }
+        if (loupeTrackEl) {
+          const tx = (m.loupeW * 0.5) - m.mag * centerXInTrack;
+          const ty = (m.loupeH * 0.5) - m.mag * (m.trackH * 0.5);
+          loupeTrackEl.style.transform = `translate3d(${tx.toFixed(2)}px, ${ty.toFixed(2)}px, 0) scale(${m.mag})`;
+        }
+
+        // 4. Update active tab highlight + fire crisp haptic tick ONLY when crossing tab boundary
+        const visualIdx = Math.max(0, Math.min(3, Math.round(pct / 100)));
+        if (visualIdx !== sliderPhys.lastVisualIdx) {
+          sliderPhys.lastVisualIdx = visualIdx;
+          for (let i = 0; i < dockTabs.length; i++) dockTabs[i].classList.toggle('active', i === visualIdx);
+          for (let i = 0; i < loupeTabs.length; i++) loupeTabs[i].classList.toggle('active', i === visualIdx);
+          if (sliderPhys.dragging) haptic('tick');
+        }
+      }
+
+      function tickSlider(now) {
+        const dt = sliderPhys.lastT ? Math.min(32, now - sliderPhys.lastT) / 16.667 : 1;
+        sliderPhys.lastT = now;
+
+        const prevPct = sliderPhys.curPct;
+        // Ultra-responsive spring follow while dragging, smooth damped settle on release/tap
+        const stiffness = sliderPhys.dragging ? 0.45 : 0.28;
+        const alpha = 1 - Math.pow(1 - stiffness, dt);
+        sliderPhys.curPct += (sliderPhys.targetPct - sliderPhys.curPct) * alpha;
+
+        // Smooth organic velocity stretch
+        const vel = (sliderPhys.curPct - prevPct) / Math.max(0.5, dt);
+        const targetSx = 1 + Math.min(0.085, Math.abs(vel) * 0.0032);
+        const targetSy = 1 / Math.sqrt(targetSx);
+        const sAlpha = 1 - Math.pow(1 - 0.30, dt);
+        sliderPhys.sx += (targetSx - sliderPhys.sx) * sAlpha;
+        sliderPhys.sy += (targetSy - sliderPhys.sy) * sAlpha;
+
+        const nearestRest = Math.round(sliderPhys.curPct / 100) * 100;
+        const distFromRest = Math.abs(sliderPhys.curPct - nearestRest);
+        const isMagnifying = (sliderPhys.dragging || sliderPhys.gliding) && distFromRest > 2.2;
+
+        applySliderFrame(sliderPhys.curPct, isMagnifying, sliderPhys.sx, sliderPhys.sy);
+
+        const settled = !sliderPhys.dragging && Math.abs(sliderPhys.targetPct - sliderPhys.curPct) < 0.25 && Math.abs(sliderPhys.sx - 1) < 0.004;
+        if (settled) {
+          sliderPhys.curPct = sliderPhys.targetPct;
+          sliderPhys.sx = 1;
+          sliderPhys.sy = 1;
+          sliderPhys.gliding = false;
+          sliderPhys.rafId = null;
+          sliderPhys.lastT = 0;
+          applySliderFrame(sliderPhys.curPct, false, 1, 1);
+        } else {
+          sliderPhys.rafId = requestAnimationFrame(tickSlider);
+        }
+      }
+
+      function ensureSliderLoop() {
+        if (!sliderPhys.rafId) {
+          sliderPhys.lastT = performance.now();
+          sliderPhys.rafId = requestAnimationFrame(tickSlider);
+        }
+      }
+
+      function updateIslandUI() {
+        const idx = activeIslandIndex();
+        const target = idx * 100;
+        if (!sliderPhys.dragging && !sliderPhys.gliding) {
+          sliderPhys.curPct = target;
+          sliderPhys.targetPct = target;
+          sliderPhys.lastVisualIdx = -1;
+          applySliderFrame(target, false, 1, 1);
+        }
+      }
+
+      window.addEventListener('resize', () => {
+        measureDock();
+        applySliderFrame(sliderPhys.curPct, false, 1, 1);
+      }, { passive: true });
+
+      function syncUnits(keep) {
+        const sels = [document.getElementById('addUnitSelect'), document.getElementById('invUnitSelect'), document.getElementById('editItemUnit'), document.getElementById('defaultUnitSelect')];
+        const prevs = sels.map(s => s.value), opts = state.settings.units.map(u => `<option value="${esc(u.name)}">${esc(u.name)}</option>`).join('');
+        sels.forEach(s => s.innerHTML = opts);
+        const names = state.settings.units.map(u => u.name);
+        if (!names.includes(state.settings.defaultUnit)) state.settings.defaultUnit = names[0] || 'numbers';
+        document.getElementById('defaultUnitSelect').value = state.settings.defaultUnit;
+        document.getElementById('addUnitSelect').value = (keep && names.includes(prevs[0])) ? prevs[0] : state.settings.defaultUnit;
+        document.getElementById('invUnitSelect').value = (keep && names.includes(prevs[1])) ? prevs[1] : state.settings.defaultUnit;
+      }
+
+      function syncCategorySelects() {
+        const addSel = document.getElementById('addCategorySelect'), invSel = document.getElementById('invCategorySelect'), editSel = document.getElementById('editItemCategory');
+        const opts = state.categories.map(c => `<option value="${esc(c.name)}">${esc(c.name)}</option>`).join('');
+        addSel.innerHTML = opts; invSel.innerHTML = opts; editSel.innerHTML = opts;
+        if (state.activeList !== 'All' && state.categories.some(c => c.name === state.activeList)) { addSel.value = state.activeList; addSel.classList.add('hidden'); } else addSel.classList.remove('hidden');
+        if (state.activeInvCat !== 'All' && state.categories.some(c => c.name === state.activeInvCat)) { invSel.value = state.activeInvCat; invSel.classList.add('hidden'); } else invSel.classList.remove('hidden');
+
+        const tagOpts = '<option value="">Item category</option>' + state.categories.filter(c => c.name !== 'Wish List').map(c => `<option value="${esc(c.name)}">${esc(c.name)}</option>`).join('') + '<option value="Home & Living">Home &amp; Living</option><option value="Other">Other</option>';
+        document.getElementById('addWishTagSelect').innerHTML = tagOpts;
+        document.getElementById('editItemWishTag').innerHTML = tagOpts;
+        const eff = state.activeList !== 'All' ? state.activeList : addSel.value;
+        document.getElementById('wishExtraFields').classList.toggle('hidden', String(eff).toLowerCase() !== 'wish list');
+      }
+
+      function unitOpts(curr) { const names = state.settings.units.map(u => u.name); const list = names.includes(curr) ? names : [curr, ...names]; return list.map(u => `<option value="${esc(u)}" ${u === curr ? 'selected' : ''}>${esc(u)}</option>`).join(''); }
+
+      function renderSwipeableListRow(item, isLast, inTodayView) {
+        const meta = getCatMeta(item.category), invMatch = findInv(item.name);
+        const stockText = invMatch ? `In stock: ${fmtQty(invMatch.qty)} ${invMatch.unit}` : 'In stock: 0';
+        const stockCol = invMatch && invMatch.qty > 0 ? 'var(--ios-green)' : 'var(--text-tertiary)';
+        const borderClass = isLast ? '' : 'border-b ios-divider';
+        const todayLabel = item.forToday ? 'Remove' : 'Today';
+
+        return `
+          <div class="swipe-shell ${borderClass}" data-swipe-type="list" data-swipe-id="${esc(item.id)}">
+            <div class="swipe-actions-bg">
+              <button type="button" data-swipe-action="delete" class="swipe-btn-delete">
+                <i data-lucide="trash-2" class="w-3.5 h-3.5"></i><span>Delete</span>
+              </button>
+              <button type="button" data-swipe-action="today" class="swipe-btn-today">
+                <i data-lucide="sun" class="w-3.5 h-3.5"></i><span>${todayLabel}</span>
+              </button>
+            </div>
+            <div class="swipe-content flex items-center gap-2 px-3 py-2.5" data-item-id="${esc(item.id)}">
+              <button type="button" data-action="toggle" class="check-circle ${item.checked ? 'checked' : ''}">
+                ${item.checked ? '<i data-lucide="check" class="w-3 h-3 stroke-[3]"></i>' : ''}
+              </button>
+              <button type="button" data-action="edit" class="flex-1 min-w-0 text-left">
+                <div class="flex items-center gap-1.5">
+                  <span class="fs-body font-medium truncate ${item.checked ? 'line-through opacity-50' : ''}">${esc(item.name)}</span>
+                  ${item.forToday && !inTodayView ? `<span class="fs-xs font-bold px-1.5 py-0.5 rounded-full shrink-0" style="background-color: rgba(255,149,0,0.16); color: var(--ios-orange);">Today</span>` : ''}
+                </div>
+                <div class="flex items-center flex-wrap gap-1.5 fs-xs mt-0.5" style="color: var(--text-secondary);">
+                  ${item.category === 'Wish List'
+                    ? `${fmtPrice(item.price) ? `<span class="font-bold" style="color: var(--ios-blue);">${esc(fmtPrice(item.price))}</span>` : ''}${item.wishTag ? `<span>${esc(item.wishTag)}</span>` : ''}${item.link ? `<a href="${esc(normUrl(item.link))}" target="_blank" rel="noopener noreferrer" data-action="openLink" class="font-semibold underline" style="color: var(--ios-blue);">Link ↗</a>` : ''}`
+                    : `<span class="font-semibold" style="color: ${stockCol};">${esc(stockText)}</span>`
+                  }
+                  ${inTodayView ? `<span>·</span><span class="inline-block w-1.5 h-1.5 rounded-full" style="background-color:${meta.color};"></span><span>${esc(item.category)}</span>` : ''}
+                  ${item.note ? `<span>·</span><span class="truncate">${esc(item.note)}</span>` : ''}
+                </div>
+              </button>
+              <div class="stepper-pill inline-flex items-center px-0.5 py-0.5 shrink-0 ${item.checked ? 'opacity-60' : ''}">
+                <button type="button" data-action="dec" class="stepper-btn" style="color: var(--ios-blue);"><i data-lucide="minus" class="w-3 h-3"></i></button>
+                <button type="button" data-action="edit" class="px-1 fs-sub font-semibold">${fmtQty(item.qty)}</button>
+                <select data-action="unit" class="inline-unit-select">${unitOpts(item.unit)}</select>
+                <button type="button" data-action="inc" class="stepper-btn" style="color: var(--ios-blue);"><i data-lucide="plus" class="w-3 h-3"></i></button>
+              </div>
+            </div>
+          </div>`;
+      }
+
+      function renderSwipeableTodoRow(t, isLast, inTodayView) {
+        const borderClass = isLast ? '' : 'border-b ios-divider';
+        const prioCol = t.priority === 'High' ? 'var(--ios-red)' : t.priority === 'Low' ? 'var(--text-tertiary)' : 'var(--ios-orange)';
+        const todayLabel = t.forToday ? 'Remove' : 'Today';
+        return `
+          <div class="swipe-shell ${borderClass}" data-swipe-type="todo" data-swipe-id="${esc(t.id)}">
+            <div class="swipe-actions-bg">
+              <button type="button" data-swipe-action="delete" class="swipe-btn-delete">
+                <i data-lucide="trash-2" class="w-3.5 h-3.5"></i><span>Delete</span>
+              </button>
+              <button type="button" data-swipe-action="today" class="swipe-btn-today">
+                <i data-lucide="sun" class="w-3.5 h-3.5"></i><span>${todayLabel}</span>
+              </button>
+            </div>
+            <div class="swipe-content flex items-center gap-2.5 px-3 py-2.5" data-todo-id="${esc(t.id)}">
+              <button type="button" data-todo-action="toggle" class="check-circle ${t.done ? 'checked' : ''}">
+                ${t.done ? '<i data-lucide="check" class="w-3 h-3 stroke-[3]"></i>' : ''}
+              </button>
+              <div class="flex-1 min-w-0">
+                <div class="flex items-center gap-1.5">
+                  <span class="fs-body font-medium truncate ${t.done ? 'line-through opacity-50' : ''}">${esc(t.title)}</span>
+                  ${t.forToday && !inTodayView ? `<span class="fs-xs font-bold px-1.5 py-0.5 rounded-full shrink-0" style="background-color: rgba(255,149,0,0.16); color: var(--ios-orange);">Today</span>` : ''}
+                </div>
+                <div class="flex items-center gap-1.5 fs-xs mt-0.5" style="color: var(--text-secondary);">
+                  <span class="font-semibold" style="color: ${prioCol};">${esc(t.priority)}</span>
+                  ${t.due ? `<span>·</span><span>${esc(t.due)}</span>` : ''}
+                </div>
+              </div>
+              <button type="button" data-todo-action="quickToday" title="${t.forToday ? 'Remove from Today' : 'Push to Today'}" class="p-1.5 rounded-lg" style="color: ${t.forToday ? 'var(--ios-orange)' : 'var(--text-tertiary)'};">
+                <i data-lucide="sun" class="w-3.5 h-3.5"></i>
+              </button>
+            </div>
+          </div>`;
+      }
+
+      function renderInvRow(item, isLast) {
+        const borderClass = isLast ? '' : 'border-b ios-divider';
+        return `
+          <div class="flex items-center gap-2 px-3 py-2.5 ${borderClass}" data-inv-id="${esc(item.id)}">
+            <button type="button" data-inv-action="toList" title="Send to Shopping List" class="w-7 h-7 rounded-lg flex items-center justify-center shrink-0" style="background-color: var(--bg-input); color: var(--ios-blue);">
+              <i data-lucide="shopping-cart" class="w-3.5 h-3.5"></i>
+            </button>
+            <button type="button" data-inv-action="edit" class="flex-1 min-w-0 text-left">
+              <div class="fs-body font-medium truncate ${item.qty <= 0 ? 'opacity-50' : ''}">${esc(item.name)}</div>
+              <div class="fs-xs truncate mt-0.5" style="color: ${item.qty <= 0 ? 'var(--ios-red)' : 'var(--text-secondary)'};">${item.qty <= 0 ? 'Out of stock' : (item.note || 'In stock')}</div>
+            </button>
+            <div class="stepper-pill inline-flex items-center px-0.5 py-0.5 shrink-0">
+              <button type="button" data-inv-action="dec" class="stepper-btn" style="color: var(--ios-blue);"><i data-lucide="minus" class="w-3 h-3"></i></button>
+              <button type="button" data-inv-action="edit" class="px-1 fs-sub font-semibold">${fmtQty(item.qty)}</button>
+              <select data-inv-action="unit" class="inline-unit-select">${unitOpts(item.unit)}</select>
+              <button type="button" data-inv-action="inc" class="stepper-btn" style="color: var(--ios-blue);"><i data-lucide="plus" class="w-3 h-3"></i></button>
+            </div>
+          </div>`;
+      }
+
+      function renderListDropdownBlocks() {
+        const tagOpts = '<option value="">Item category</option>' +
+          state.categories.filter(c => c.name !== 'Wish List').map(c => `<option value="${esc(c.name)}">${esc(c.name)}</option>`).join('') +
+          '<option value="Home & Living">Home &amp; Living</option><option value="Other">Other</option>';
+
+        document.getElementById('dashboardGrid').innerHTML = state.categories.map(cat => {
+          const catItems = state.items
+            .filter(i => i.category === cat.name)
+            .sort((a, b) => Number(a.checked) - Number(b.checked));
+          const pending = catItems.filter(i => !i.checked).length;
+          const closed = catItems.length - pending;
+          const isOpen = Boolean(state.openListCats[cat.name]);
+          const isWish = cat.name.toLowerCase() === 'wish list';
+
+          return `
+            <div class="ios-card overflow-hidden">
+              <button type="button" data-toggle-list-cat="${esc(cat.name)}" class="w-full px-3.5 py-3 flex items-center justify-between gap-3 text-left transition">
+                <div class="flex items-center gap-3 min-w-0 flex-1">
+                  <div class="glass-icon-tile w-9 h-9 flex items-center justify-center text-white shrink-0" style="background-color: ${cat.color};">
+                    <i data-lucide="${esc(cat.icon || 'folder')}" class="w-4 h-4"></i>
+                  </div>
+                  <div class="min-w-0 flex-1">
+                    <div class="fs-body font-bold truncate">${esc(cat.name)}</div>
+                    <div class="fs-xs truncate mt-0.5" style="color: var(--text-secondary);">${pending} pending · ${closed} closed</div>
+                  </div>
+                </div>
+                <div class="flex items-center gap-2 shrink-0">
+                  <span class="fs-xs font-bold px-2 py-0.5 rounded-full" style="background-color: var(--bg-input); color: ${pending > 0 ? 'var(--text-primary)' : 'var(--ios-green)'};">${pending}</span>
+                  <i data-lucide="chevron-down" class="w-4 h-4 transition-transform duration-200" style="color: var(--text-tertiary); transform: rotate(${isOpen ? 180 : 0}deg);"></i>
+                </div>
+              </button>
+              ${isOpen ? `
+                <div class="border-t ios-divider">
+                  <form data-inline-add-list="${esc(cat.name)}" class="p-2.5 space-y-2 border-b ios-divider" style="background-color: rgba(120,120,128,0.04);">
+                    <div class="flex items-center gap-1.5">
+                      <input type="text" name="itemName" autocomplete="off" placeholder="Add to ${esc(cat.name)}..." class="ios-input fs-body flex-1 pl-3 pr-2.5 py-1.5 rounded-lg focus:outline-none" />
+                      <button type="submit" class="px-2.5 py-1.5 rounded-lg text-white font-semibold fs-sub flex items-center gap-1 shrink-0 active:scale-95 transition" style="background-color: var(--ios-blue);">
+                        <i data-lucide="plus" class="w-3.5 h-3.5"></i><span>Add</span>
+                      </button>
+                    </div>
+                    <div data-inline-inv-hint class="hidden flex items-center justify-between px-2.5 py-1 rounded-lg fs-xs font-medium"></div>
+                    <div class="flex flex-wrap items-center gap-1.5">
+                      <div class="stepper-pill inline-flex items-center px-0.5 py-0.5">
+                        <button type="button" data-inline-qty-step="-1" class="stepper-btn" style="color: var(--ios-blue);"><i data-lucide="minus" class="w-3 h-3"></i></button>
+                        <input type="number" name="itemQty" min="0.25" step="any" value="1" class="w-10 text-center bg-transparent fs-sub font-semibold focus:outline-none" />
+                        <button type="button" data-inline-qty-step="1" class="stepper-btn" style="color: var(--ios-blue);"><i data-lucide="plus" class="w-3 h-3"></i></button>
+                      </div>
+                      <select name="itemUnit" class="ios-input fs-sub font-medium rounded-lg px-2 py-1 focus:outline-none">${unitOpts(state.settings.defaultUnit)}</select>
+                    </div>
+                    ${isWish ? `
+                      <div class="space-y-1.5 pt-1 border-t ios-divider">
+                        <div class="grid grid-cols-2 gap-1.5">
+                          <div class="relative">
+                            <span class="absolute left-2.5 top-1/2 -translate-y-1/2 fs-sub font-semibold" style="color: var(--text-tertiary);">₹</span>
+                            <input type="number" name="itemPrice" min="0" step="any" placeholder="Price" class="ios-input fs-sub w-full pl-6 pr-2 py-1 rounded-lg focus:outline-none" />
+                          </div>
+                          <select name="itemWishTag" class="ios-input fs-sub font-medium rounded-lg px-2 py-1 focus:outline-none">${tagOpts}</select>
+                        </div>
+                        <input type="url" name="itemLink" placeholder="Product link (https://...)" class="ios-input fs-sub w-full px-2.5 py-1 rounded-lg focus:outline-none" />
+                      </div>
+                    ` : ''}
+                  </form>
+                  ${catItems.length
+                    ? catItems.map((it, idx) => renderSwipeableListRow(it, idx === catItems.length - 1, false)).join('')
+                    : `<div class="p-4 text-center fs-sub" style="color: var(--text-secondary);">No items in ${esc(cat.name)} yet. Add one above!</div>`
+                  }
+                </div>
+              ` : ''}
+            </div>`;
+        }).join('');
+      }
+
+      function renderInvDropdownBlocks() {
+        document.getElementById('invDashboardGrid').innerHTML = state.categories.map(cat => {
+          const catItems = state.inventory.filter(i => i.category === cat.name);
+          const inStock = catItems.filter(i => i.qty > 0).length;
+          const lowOut = catItems.length - inStock;
+          const isOpen = Boolean(state.openInvCats[cat.name]);
+
+          return `
+            <div class="ios-card overflow-hidden">
+              <button type="button" data-toggle-inv-cat="${esc(cat.name)}" class="w-full px-3.5 py-3 flex items-center justify-between gap-3 text-left transition">
+                <div class="flex items-center gap-3 min-w-0 flex-1">
+                  <div class="glass-icon-tile w-9 h-9 flex items-center justify-center text-white shrink-0" style="background-color: ${cat.color};">
+                    <i data-lucide="${esc(cat.icon || 'folder')}" class="w-4 h-4"></i>
+                  </div>
+                  <div class="min-w-0 flex-1">
+                    <div class="fs-body font-bold truncate">${esc(cat.name)}</div>
+                    <div class="fs-xs truncate mt-0.5" style="color: var(--text-secondary);">${inStock} in stock · ${lowOut} low / out</div>
+                  </div>
+                </div>
+                <div class="flex items-center gap-2 shrink-0">
+                  <span class="fs-xs font-bold px-2 py-0.5 rounded-full" style="background-color: var(--bg-input); color: ${inStock > 0 ? 'var(--ios-green)' : 'var(--text-secondary)'};">${inStock}</span>
+                  <i data-lucide="chevron-down" class="w-4 h-4 transition-transform duration-200" style="color: var(--text-tertiary); transform: rotate(${isOpen ? 180 : 0}deg);"></i>
+                </div>
+              </button>
+              ${isOpen ? `
+                <div class="border-t ios-divider">
+                  <form data-inline-add-inv="${esc(cat.name)}" class="p-2.5 space-y-2 border-b ios-divider" style="background-color: rgba(120,120,128,0.04);">
+                    <div class="flex items-center gap-1.5">
+                      <input type="text" name="invName" autocomplete="off" placeholder="Add stock to ${esc(cat.name)}..." class="ios-input fs-body flex-1 pl-3 pr-2.5 py-1.5 rounded-lg focus:outline-none" />
+                      <button type="submit" class="px-2.5 py-1.5 rounded-lg text-white font-semibold fs-sub flex items-center gap-1 shrink-0 active:scale-95 transition" style="background-color: var(--ios-green);">
+                        <i data-lucide="plus" class="w-3.5 h-3.5"></i><span>Add</span>
+                      </button>
+                    </div>
+                    <div class="flex flex-wrap items-center gap-1.5">
+                      <div class="stepper-pill inline-flex items-center px-0.5 py-0.5">
+                        <button type="button" data-inline-inv-step="-1" class="stepper-btn" style="color: var(--ios-blue);"><i data-lucide="minus" class="w-3 h-3"></i></button>
+                        <input type="number" name="invQty" min="0" step="any" value="1" class="w-10 text-center bg-transparent fs-sub font-semibold focus:outline-none" />
+                        <button type="button" data-inline-inv-step="1" class="stepper-btn" style="color: var(--ios-blue);"><i data-lucide="plus" class="w-3 h-3"></i></button>
+                      </div>
+                      <select name="invUnit" class="ios-input fs-sub font-medium rounded-lg px-2 py-1 focus:outline-none">${unitOpts(state.settings.defaultUnit)}</select>
+                    </div>
+                  </form>
+                  ${catItems.length
+                    ? catItems.map((it, idx) => renderInvRow(it, idx === catItems.length - 1)).join('')
+                    : `<div class="p-4 text-center fs-sub" style="color: var(--text-secondary);">No stock tracked in ${esc(cat.name)} yet.</div>`
+                  }
+                </div>
+              ` : ''}
+            </div>`;
+        }).join('');
+      }
+
+      function renderSettingsContent() {
+        document.querySelectorAll('[data-font-opt]').forEach(btn => btn.classList.toggle('active', btn.dataset.fontOpt === state.settings.fontSize));
+        document.getElementById('themeColorPicker').innerHTML = THEME_COLORS.map(hex => `<button type="button" data-theme-color="${hex}" class="w-7 h-7 rounded-full transition ${state.settings.themeColor === hex ? 'scale-110 ring-2 ring-offset-2 ring-zinc-400' : 'opacity-80'}" style="background-color: ${hex};"></button>`).join('');
+        document.getElementById('appIconPicker').innerHTML = APP_ICONS.map(ic => {
+          const active = state.settings.appIcon === ic.id;
+          return `<button type="button" data-app-icon="${ic.id}" class="flex flex-col items-center justify-center gap-1 py-2 rounded-xl border" style="${active ? 'background-color: var(--ios-blue); color: #fff; border-color: transparent;' : 'background-color: var(--bg-input); color: var(--text-primary); border-color: var(--border-hairline);'}"><i data-lucide="${ic.id}" class="w-4 h-4"></i><span class="fs-xs font-medium">${ic.label}</span></button>`;
+        }).join('');
+        document.getElementById('settingsUnitsList').innerHTML = state.settings.units.map(u => `<span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full fs-xs font-medium" style="background-color: var(--bg-input);"><span>${esc(u.name)}</span><span style="color: var(--text-tertiary);">(±${fmtQty(u.step)})</span>${state.settings.units.length > 1 ? `<button type="button" data-remove-unit="${esc(u.name)}" style="color: var(--ios-red);">×</button>` : ''}</span>`).join('');
+        document.getElementById('settingsCategoriesList').innerHTML = state.categories.map(c => `<span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full fs-xs font-medium" style="background-color: var(--bg-input);"><span class="w-2 h-2 rounded-full" style="background-color: ${c.color};"></span><span>${esc(c.name)}</span>${state.categories.length > 1 ? `<button type="button" data-remove-cat="${esc(c.name)}" style="color: var(--ios-red);">×</button>` : ''}</span>`).join('');
+        document.getElementById('settingsCatColors').innerHTML = ACCENT_PALETTE.map(hex => `<button type="button" data-color-hex="${hex}" class="w-6 h-6 rounded-full ${state.selectedNewColor === hex ? 'scale-110 ring-2 ring-offset-2 ring-blue-500' : 'opacity-80'}" style="background-color: ${hex};"></button>`).join('');
+        refreshIcons();
+      }
+
+      function render() {
+        updateIslandUI();
+
+        // Drawer badges
+        const todayListItems = state.items.filter(i => i.forToday);
+        const todayTaskItems = state.todos.filter(t => t.forToday);
+        document.getElementById('drawerInvCount').textContent = state.inventory.length;
+        document.getElementById('drawerTotalPending').textContent = state.items.filter(i => !i.checked).length;
+        document.getElementById('drawerTodoCount').textContent = state.todos.filter(t => !t.done).length;
+        document.getElementById('drawerTodayCount').textContent = todayListItems.filter(i => !i.checked).length + todayTaskItems.filter(t => !t.done).length;
+        const db = document.getElementById('drawerAppBadge'); db.style.backgroundColor = state.settings.themeColor; db.innerHTML = `<i data-lucide="${esc(state.settings.appIcon)}" class="w-4 h-4"></i>`;
+
+        // View visibility
+        ['homeView', 'listView', 'invHomeView', 'invListView', 'todoView', 'todayView'].forEach(id => {
+          document.getElementById(id).classList.add('hidden');
+        });
+        const mapId = { home: 'homeView', list: 'listView', invHome: 'invHomeView', invList: 'invListView', todo: 'todoView', today: 'todayView' };
+        document.getElementById(mapId[state.view]).classList.remove('hidden');
+
+        const backBtn = document.getElementById('backBtn');
+        const showBack = state.view === 'list' || state.view === 'invList';
+        backBtn.classList.toggle('hidden', !showBack);
+        if (state.view === 'list') document.getElementById('backBtnLabel').textContent = 'Lists';
+        if (state.view === 'invList') document.getElementById('backBtnLabel').textContent = 'Inventory';
+
+        const hb = document.getElementById('headerBadge'), ht = document.getElementById('headerTitle'), hs = document.getElementById('headerSubtitle');
+        const s1L = document.getElementById('summaryCard1Label'), s1C = document.getElementById('summaryCard1Count');
+        const s2L = document.getElementById('summaryCard2Label'), s2C = document.getElementById('summaryCard2Count');
+
+        if (state.view === 'invHome' || state.view === 'invList') {
+          const scopedInv = state.view === 'invHome' || state.activeInvCat === 'All' ? state.inventory : state.inventory.filter(i => i.category === state.activeInvCat);
+          const inStock = scopedInv.filter(i => i.qty > 0).length, lowOut = scopedInv.length - inStock;
+          hb.style.backgroundColor = state.view === 'invList' && state.activeInvCat !== 'All' ? getCatMeta(state.activeInvCat).color : '#34C759';
+          hb.innerHTML = '<i data-lucide="boxes" class="w-4 h-4"></i>';
+          ht.textContent = state.view === 'invHome' ? 'Inventory' : (state.activeInvCat === 'All' ? 'All Stock' : state.activeInvCat);
+          hs.textContent = `${scopedInv.length} tracked items`;
+          s1L.textContent = 'Low / Out'; s1C.textContent = lowOut;
+          s2L.textContent = 'In Stock'; s2C.textContent = inStock;
+
+          if (state.view === 'invHome') {
+            renderInvDropdownBlocks();
+          } else {
+            const q = state.invSearch.trim().toLowerCase();
+            const fil = scopedInv.filter(i => !q || i.name.toLowerCase().includes(q) || (i.note || '').toLowerCase().includes(q));
+            const cont = document.getElementById('inventoryContainer'), emp = document.getElementById('invEmptyState');
+            if (!fil.length) { cont.innerHTML = ''; emp.classList.remove('hidden'); }
+            else { emp.classList.add('hidden'); cont.innerHTML = `<div class="ios-card overflow-hidden">${fil.map((it, idx) => renderInvRow(it, idx === fil.length - 1)).join('')}</div>`; }
+          }
+          refreshIcons(); return;
+        }
+
+        if (state.view === 'todo') {
+          const cl = state.todos.filter(t => t.done).length, pn = state.todos.length - cl;
+          hb.style.backgroundColor = '#5856D6'; hb.innerHTML = '<i data-lucide="check-square" class="w-4 h-4"></i>';
+          ht.textContent = 'To-Do List'; hs.textContent = `${pn} pending tasks`;
+          s1L.textContent = 'Pending'; s1C.textContent = pn; s2L.textContent = 'Closed'; s2C.textContent = cl;
+          document.getElementById('todoCountAll').textContent = state.todos.length;
+          document.getElementById('todoCountActive').textContent = pn;
+          document.getElementById('todoCountChecked').textContent = cl;
+          document.getElementById('clearTodoClosedBtn').disabled = cl === 0;
+          document.querySelectorAll('[data-todo-filter]').forEach(b => b.classList.toggle('active', b.dataset.todoFilter === state.todoFilter));
+          const fil = state.todos.filter(t => state.todoFilter === 'active' ? !t.done : state.todoFilter === 'checked' ? t.done : true).sort((a, b) => Number(a.done) - Number(b.done));
+          const tc = document.getElementById('todoContainer'), te = document.getElementById('todoEmptyState');
+          if (!fil.length) { tc.innerHTML = ''; te.classList.remove('hidden'); }
+          else { te.classList.add('hidden'); tc.innerHTML = `<div class="ios-card overflow-hidden">${fil.map((t, idx) => renderSwipeableTodoRow(t, idx === fil.length - 1, false)).join('')}</div>`; }
+          refreshIcons(); return;
+        }
+
+        if (state.view === 'today') {
+          const lPending = todayListItems.filter(i => !i.checked).length, lClosed = todayListItems.length - lPending;
+          const tPending = todayTaskItems.filter(t => !t.done).length, tClosed = todayTaskItems.length - tPending;
+          hb.style.backgroundColor = '#FF9500'; hb.innerHTML = '<i data-lucide="sun" class="w-4 h-4"></i>';
+          ht.textContent = 'Today'; hs.textContent = `${lPending + tPending} pending today`;
+          s1L.textContent = 'Pending'; s1C.textContent = lPending + tPending; s2L.textContent = 'Closed'; s2C.textContent = lClosed + tClosed;
+
+          document.getElementById('todayListBadge').textContent = todayListItems.length;
+          document.getElementById('todayListSub').textContent = `${lPending} pending · ${lClosed} closed`;
+          document.getElementById('todayListChev').style.transform = state.todayListOpen ? 'rotate(180deg)' : 'rotate(0deg)';
+          const lb = document.getElementById('todayListBody');
+          lb.classList.toggle('hidden', !state.todayListOpen);
+          lb.innerHTML = todayListItems.length
+            ? todayListItems.sort((a, b) => Number(a.checked) - Number(b.checked)).map((it, idx) => renderSwipeableListRow(it, idx === todayListItems.length - 1, true)).join('')
+            : `<div class="p-4 text-center fs-sub" style="color: var(--text-secondary);">No shopping items pushed to Today yet. Swipe left on any list item!</div>`;
+
+          document.getElementById('todayTaskBadge').textContent = todayTaskItems.length;
+          document.getElementById('todayTaskSub').textContent = `${tPending} pending · ${tClosed} closed`;
+          document.getElementById('todayTaskChev').style.transform = state.todayTaskOpen ? 'rotate(180deg)' : 'rotate(0deg)';
+          const tb = document.getElementById('todayTaskBody');
+          tb.classList.toggle('hidden', !state.todayTaskOpen);
+          tb.innerHTML = todayTaskItems.length
+            ? todayTaskItems.sort((a, b) => Number(a.done) - Number(b.done)).map((t, idx) => renderSwipeableTodoRow(t, idx === todayTaskItems.length - 1, true)).join('')
+            : `<div class="p-4 text-center fs-sub" style="color: var(--text-secondary);">No tasks pushed to Today yet. Swipe left on any To-Do task!</div>`;
+          refreshIcons(); return;
+        }
+
+        // Lists Home or Category List View
+        const scoped = state.view === 'home' || state.activeList === 'All' ? state.items : state.items.filter(i => i.category === state.activeList);
+        const closed = scoped.filter(i => i.checked).length, pending = scoped.length - closed;
+        hb.style.backgroundColor = state.view === 'list' && state.activeList !== 'All' ? getCatMeta(state.activeList).color : state.settings.themeColor;
+        hb.innerHTML = `<i data-lucide="${esc(state.settings.appIcon)}" class="w-4 h-4"></i>`;
+        ht.textContent = state.view === 'home' ? 'FreshCart' : (state.activeList === 'All' ? 'All Items' : state.activeList);
+        hs.textContent = pending === 0 && scoped.length ? 'All items closed' : `${pending} pending items`;
+        s1L.textContent = 'Pending'; s1C.textContent = pending; s2L.textContent = 'Closed'; s2C.textContent = closed;
+
+        if (state.view === 'home') {
+          renderListDropdownBlocks();
+          refreshIcons(); return;
+        }
+
+        document.getElementById('countAll').textContent = scoped.length;
+        document.getElementById('countActive').textContent = pending;
+        document.getElementById('countChecked').textContent = closed;
+        document.getElementById('clearCheckedBtn').disabled = closed === 0;
+        document.querySelectorAll('[data-filter]').forEach(b => b.classList.toggle('active', b.dataset.filter === state.filter));
+        const q = state.search.trim().toLowerCase();
+        const fil = scoped.filter(i => (state.filter === 'active' ? !i.checked : state.filter === 'checked' ? i.checked : true) && (!q || i.name.toLowerCase().includes(q) || (i.note || '').toLowerCase().includes(q))).sort((a, b) => Number(a.checked) - Number(b.checked));
+        const lc = document.getElementById('listContainer'), emp = document.getElementById('emptyState');
+        if (!fil.length) { lc.innerHTML = ''; emp.classList.remove('hidden'); }
+        else { emp.classList.add('hidden'); lc.innerHTML = `<div class="ios-card overflow-hidden">${fil.map((it, idx) => renderSwipeableListRow(it, idx === fil.length - 1, false)).join('')}</div>`; }
+        refreshIcons();
+      }
+
+      // ==================== SWIPE GESTURE ENGINE (Right = Delete, Left = For Today) ====================
+      let swipe = { el: null, shell: null, pid: null, startX: 0, startY: 0, dx: 0, locked: null };
+      function resetAllSwipes(exceptEl) {
+        document.querySelectorAll('.swipe-content').forEach(el => {
+          if (el !== exceptEl) { el.style.transform = 'translateX(0px)'; el.dataset.openSide = ''; }
+        });
+      }
+
+      document.querySelector('main').addEventListener('pointerdown', e => {
+        if (e.target.closest('select, input, button[data-action="inc"], button[data-action="dec"], button[data-action="toggle"], button[data-todo-action="toggle"], a')) return;
+        const content = e.target.closest('.swipe-content');
+        if (!content) return;
+        const shell = content.closest('.swipe-shell');
+        resetAllSwipes(content);
+        const baseOffset = content.dataset.openSide === 'right' ? 92 : content.dataset.openSide === 'left' ? -96 : 0;
+        swipe = { el: content, shell, pid: e.pointerId, startX: e.clientX, startY: e.clientY, baseOffset, dx: baseOffset, locked: null };
+      });
+
+      document.querySelector('main').addEventListener('pointermove', e => {
+        if (!swipe.el || e.pointerId !== swipe.pid) return;
+        const diffX = e.clientX - swipe.startX, diffY = e.clientY - swipe.startY;
+        if (!swipe.locked) {
+          if (Math.abs(diffX) > 10 && Math.abs(diffX) > Math.abs(diffY)) {
+            swipe.locked = 'x';
+            swipe.el.classList.add('swiping');
+            try { swipe.el.setPointerCapture(e.pointerId); } catch (err) {}
+          } else if (Math.abs(diffY) > 10) {
+            swipe.el = null; return;
+          }
+        }
+        if (swipe.locked === 'x') {
+          swipe.dx = Math.max(-140, Math.min(140, swipe.baseOffset + diffX));
+          swipe.el.style.transform = `translateX(${swipe.dx}px)`;
+        }
+      });
+
+      const endSwipe = (e) => {
+        if (!swipe.el || e.pointerId !== swipe.pid) return;
+        const el = swipe.el, shell = swipe.shell, dx = swipe.dx, wasX = swipe.locked === 'x';
+        el.classList.remove('swiping');
+        try { el.releasePointerCapture(e.pointerId); } catch (err) {}
+        swipe = { el: null, shell: null, pid: null, startX: 0, startY: 0, dx: 0, locked: null };
+        if (!wasX) return;
+
+        if (dx > 115) {
+          // Full swipe right -> immediate Delete
+          triggerSwipeAction(shell.dataset.swipeType, shell.dataset.swipeId, 'delete');
+        } else if (dx < -115) {
+          // Full swipe left -> immediate Push/Toggle Today
+          triggerSwipeAction(shell.dataset.swipeType, shell.dataset.swipeId, 'today');
+        } else if (dx > 44) {
+          el.style.transform = 'translateX(92px)'; el.dataset.openSide = 'right';
+        } else if (dx < -44) {
+          el.style.transform = 'translateX(-96px)'; el.dataset.openSide = 'left';
+        } else {
+          el.style.transform = 'translateX(0px)'; el.dataset.openSide = '';
+        }
+      };
+      document.querySelector('main').addEventListener('pointerup', endSwipe);
+      document.querySelector('main').addEventListener('pointercancel', endSwipe);
+
+      function triggerSwipeAction(type, id, action) {
+        haptic();
+        if (type === 'list') {
+          const item = state.items.find(i => i.id === id); if (!item) return;
+          if (action === 'delete') {
+            const snap = [...state.items]; state.items = state.items.filter(i => i.id !== id); saveAll(); render();
+            showToast(`Deleted "${item.name}"`, () => { state.items = snap; saveAll(); render(); });
+          } else if (action === 'today') {
+            item.forToday = !item.forToday; saveAll(); render();
+            showToast(item.forToday ? `Moved "${item.name}" to For Today` : `Removed "${item.name}" from Today`);
+          }
+        } else if (type === 'todo') {
+          const t = state.todos.find(x => x.id === id); if (!t) return;
+          if (action === 'delete') {
+            const snap = [...state.todos]; state.todos = state.todos.filter(x => x.id !== id); saveAll(); render();
+            showToast(`Deleted "${t.title}"`, () => { state.todos = snap; saveAll(); render(); });
+          } else if (action === 'today') {
+            t.forToday = !t.forToday; saveAll(); render();
+            showToast(t.forToday ? `Moved "${t.title}" to For Today` : `Removed "${t.title}" from Today`);
+          }
+        }
+      }
+
+      // Click handler for revealed Swipe Action Buttons
+      document.querySelector('main').addEventListener('click', e => {
+        const swipeBtn = e.target.closest('[data-swipe-action]');
+        if (swipeBtn) {
+          const shell = swipeBtn.closest('.swipe-shell');
+          if (shell) triggerSwipeAction(shell.dataset.swipeType, shell.dataset.swipeId, swipeBtn.dataset.swipeAction);
+          return;
+        }
+      });
+
+      // ==================== DRAGGABLE 4-TAB ETCHED LIQUID GLASS LOUPE SLIDER ====================
+      let islandDrag = { active: false, pid: null, sx: 0, moved: false };
+      const switchIsland = (idx, animateGlide) => {
+        const prevIdx = activeIslandIndex();
+        haptic('light');
+        restoreTab(idx, Boolean(animateGlide));
+
+        if (animateGlide && prevIdx !== idx) {
+          measureDock();
+          sliderPhys.curPct = prevIdx * 100;
+          sliderPhys.targetPct = idx * 100;
+          sliderPhys.gliding = true;
+          ensureSliderLoop();
+        }
+      };
+      const pctFromClientX = (cx) => {
+        const m = dockMetrics || measureDock();
+        if (!m) return sliderPhys.targetPct;
+        const clamped = Math.max(0, Math.min(m.segW * 3, cx - m.left - m.pad - m.segW * 0.5));
+        return (clamped / m.segW) * 100;
+      };
+      dockEl.addEventListener('pointerdown', e => {
+        measureDock();
+        islandDrag = { active: true, pid: e.pointerId, sx: e.clientX, moved: false };
+        sliderPhys.dragging = true;
+        sliderPhys.gliding = false;
+        try { dockEl.setPointerCapture(e.pointerId); } catch (err) {}
+      });
+      dockEl.addEventListener('pointermove', e => {
+        if (!islandDrag.active || e.pointerId !== islandDrag.pid) return;
+        if (!islandDrag.moved && Math.abs(e.clientX - islandDrag.sx) > 3) {
+          islandDrag.moved = true;
+          haptic('tick');
+        }
+        if (islandDrag.moved) {
+          sliderPhys.targetPct = pctFromClientX(e.clientX);
+          ensureSliderLoop();
+        }
+      });
+      const finishIsland = e => {
+        if (!islandDrag.active || e.pointerId !== islandDrag.pid) return;
+        const wasMoved = islandDrag.moved;
+        islandDrag.active = false;
+        sliderPhys.dragging = false;
+        try { dockEl.releasePointerCapture(e.pointerId); } catch (err) {}
+        if (wasMoved) {
+          const targetIdx = Math.max(0, Math.min(3, Math.round(sliderPhys.targetPct / 100)));
+          sliderPhys.targetPct = targetIdx * 100;
+          sliderPhys.gliding = true;
+          ensureSliderLoop();
+          switchIsland(targetIdx, false);
+        } else {
+          const m = dockMetrics || measureDock();
+          const target = m ? Math.max(0, Math.min(3, Math.floor(((e.clientX - m.left) / m.width) * 4))) : activeIslandIndex();
+          switchIsland(target, true);
+        }
+      };
+      dockEl.addEventListener('pointerup', finishIsland);
+      dockEl.addEventListener('pointercancel', finishIsland);
+
+      // ==================== OTHER UI EVENTS ====================
+      document.getElementById('openDrawerBtn').addEventListener('click', openDrawer);
+      document.getElementById('closeDrawerBtn').addEventListener('click', closeDrawer);
+      document.getElementById('drawerBackdrop').addEventListener('click', closeDrawer);
+      document.getElementById('backBtn').addEventListener('click', () => state.view === 'invList' ? goInvHome() : goHome());
+      document.getElementById('navInvBtn').addEventListener('click', () => restoreTab(3, false));
+      document.getElementById('navListsBtn').addEventListener('click', () => restoreTab(2, false));
+      document.getElementById('navTodoBtn').addEventListener('click', () => restoreTab(1, false));
+      document.getElementById('navTodayBtn').addEventListener('click', () => restoreTab(0, false));
+      document.getElementById('homeOpenAllBtn').addEventListener('click', () => goList('All'));
+      document.getElementById('invOpenAllBtn').addEventListener('click', () => goInvList('All'));
+      const dashGrid = document.getElementById('dashboardGrid');
+      const invDashGrid = document.getElementById('invDashboardGrid');
+
+      dashGrid.addEventListener('click', e => {
+        const toggleBtn = e.target.closest('[data-toggle-list-cat]');
+        if (toggleBtn) {
+          const cat = toggleBtn.dataset.toggleListCat;
+          haptic('tick');
+          state.openListCats[cat] = !state.openListCats[cat];
+          render();
+          return;
+        }
+        const stepBtn = e.target.closest('[data-inline-qty-step]');
+        if (stepBtn) {
+          const form = stepBtn.closest('form');
+          const qtyInp = form.querySelector('input[name="itemQty"]');
+          const unitSel = form.querySelector('select[name="itemUnit"]');
+          const d = stepDelta(unitSel.value);
+          const dir = Number(stepBtn.dataset.inlineQtyStep);
+          const cur = parseFloat(qtyInp.value) || 1;
+          qtyInp.value = fmtQty(dir > 0 ? cur + d : Math.max(d >= 1 ? 1 : 0.25, cur - d));
+          haptic('tick');
+        }
+      });
+
+      dashGrid.addEventListener('input', e => {
+        if (e.target.name !== 'itemName') return;
+        const form = e.target.closest('form');
+        const h = form.querySelector('[data-inline-inv-hint]');
+        const v = e.target.value.trim();
+        if (!v) { h.classList.add('hidden'); return; }
+        const m = findInv(v);
+        h.classList.remove('hidden');
+        h.style.backgroundColor = m && m.qty > 0 ? 'rgba(52,199,89,0.12)' : 'var(--bg-input)';
+        h.style.color = m && m.qty > 0 ? 'var(--ios-green)' : 'var(--text-secondary)';
+        h.innerHTML = m ? `<span>In Inventory (${esc(m.name)}): <strong>${fmtQty(m.qty)} ${esc(m.unit)}</strong></span><span>Stock</span>` : `<span>Inventory stock: <strong>0</strong></span>`;
+      });
+
+      dashGrid.addEventListener('submit', e => {
+        const form = e.target.closest('form[data-inline-add-list]');
+        if (!form) return;
+        e.preventDefault();
+        const cat = form.dataset.inlineAddList;
+        const inp = form.querySelector('input[name="itemName"]');
+        const name = inp.value.trim();
+        if (!name) { inp.focus(); return; }
+        const unit = form.querySelector('select[name="itemUnit"]').value;
+        const qty = Math.max(0.25, parseFloat(form.querySelector('input[name="itemQty"]').value) || 1);
+        const priceEl = form.querySelector('input[name="itemPrice"]');
+        const wishTagEl = form.querySelector('select[name="itemWishTag"]');
+        const linkEl = form.querySelector('input[name="itemLink"]');
+        const p = priceEl ? parseFloat(priceEl.value) : NaN;
+        state.items.unshift({
+          id: 'i_' + Date.now(), name, qty, unit, category: cat, note: '', checked: false, forToday: false,
+          price: Number.isFinite(p) && p > 0 ? p : '',
+          wishTag: wishTagEl ? wishTagEl.value : '',
+          link: linkEl ? normUrl(linkEl.value) : ''
+        });
+        saveAll();
+        haptic('light');
+        render();
+        showToast(`Added ${name} to ${cat}`);
+      });
+
+      invDashGrid.addEventListener('click', e => {
+        const toggleBtn = e.target.closest('[data-toggle-inv-cat]');
+        if (toggleBtn) {
+          const cat = toggleBtn.dataset.toggleInvCat;
+          haptic('tick');
+          state.openInvCats[cat] = !state.openInvCats[cat];
+          render();
+          return;
+        }
+        const stepBtn = e.target.closest('[data-inline-inv-step]');
+        if (stepBtn) {
+          const form = stepBtn.closest('form');
+          const qtyInp = form.querySelector('input[name="invQty"]');
+          const unitSel = form.querySelector('select[name="invUnit"]');
+          const d = stepDelta(unitSel.value);
+          const dir = Number(stepBtn.dataset.inlineInvStep);
+          const cur = parseFloat(qtyInp.value) || 0;
+          qtyInp.value = fmtQty(dir > 0 ? cur + d : Math.max(0, cur - d));
+          haptic('tick');
+        }
+      });
+
+      invDashGrid.addEventListener('submit', e => {
+        const form = e.target.closest('form[data-inline-add-inv]');
+        if (!form) return;
+        e.preventDefault();
+        const cat = form.dataset.inlineAddInv;
+        const inp = form.querySelector('input[name="invName"]');
+        const name = inp.value.trim();
+        if (!name) { inp.focus(); return; }
+        const qty = Math.max(0, parseFloat(form.querySelector('input[name="invQty"]').value) || 0);
+        const unit = form.querySelector('select[name="invUnit"]').value;
+        const ex = state.inventory.find(i => i.name.toLowerCase() === name.toLowerCase());
+        if (ex) { ex.qty = Number((ex.qty + qty).toFixed(2)); ex.unit = unit; }
+        else state.inventory.unshift({ id: 'inv_' + Date.now(), name, qty, unit, category: cat, note: '' });
+        saveAll();
+        haptic('light');
+        render();
+        showToast(`Updated inventory: ${name}`);
+      });
+
+      document.getElementById('toggleTodayListSec').addEventListener('click', () => { state.todayListOpen = !state.todayListOpen; render(); });
+      document.getElementById('toggleTodayTaskSec').addEventListener('click', () => { state.todayTaskOpen = !state.todayTaskOpen; render(); });
+
+      // Notepad
+      const np = document.getElementById('drawerNotepad');
+      try { np.value = localStorage.getItem(NOTEPAD_KEY) || ''; } catch (e) {}
+      np.addEventListener('input', () => { try { localStorage.setItem(NOTEPAD_KEY, np.value); } catch (e) {} });
+      document.getElementById('clearNotepadBtn').addEventListener('click', () => { if (!np.value) return; const p = np.value; np.value = ''; try { localStorage.setItem(NOTEPAD_KEY, ''); } catch (e) {} showToast('Notepad cleared', () => { np.value = p; try { localStorage.setItem(NOTEPAD_KEY, p); } catch (e) {} }); });
+
+      // Add List Item + live Inventory hint
+      document.getElementById('itemNameInput').addEventListener('input', () => {
+        const h = document.getElementById('liveInventoryHint'), v = document.getElementById('itemNameInput').value.trim();
+        if (!v) { h.classList.add('hidden'); return; }
+        const m = findInv(v); h.classList.remove('hidden');
+        h.style.backgroundColor = m && m.qty > 0 ? 'rgba(52,199,89,0.12)' : 'var(--bg-input)';
+        h.style.color = m && m.qty > 0 ? 'var(--ios-green)' : 'var(--text-secondary)';
+        h.innerHTML = m ? `<span>In Inventory (${esc(m.name)}): <strong>${fmtQty(m.qty)} ${esc(m.unit)}</strong></span><span>Stock</span>` : `<span>Inventory stock: <strong>0</strong></span>`;
+      });
+      document.getElementById('addCategorySelect').addEventListener('change', syncCategorySelects);
+      document.getElementById('quickAddForm').addEventListener('submit', e => {
+        e.preventDefault();
+        const inp = document.getElementById('itemNameInput'), name = inp.value.trim(); if (!name) { inp.focus(); return; }
+        const cat = state.activeList !== 'All' ? state.activeList : document.getElementById('addCategorySelect').value;
+        const unit = document.getElementById('addUnitSelect').value, qty = Math.max(0.25, parseFloat(document.getElementById('addQtyInput').value) || 1);
+        const p = parseFloat(document.getElementById('addPriceInput').value);
+        state.items.unshift({ id: 'i_' + Date.now(), name, qty, unit, category: cat, note: '', checked: false, forToday: false, price: Number.isFinite(p) && p > 0 ? p : '', wishTag: document.getElementById('addWishTagSelect').value, link: normUrl(document.getElementById('addLinkInput').value) });
+        saveAll(); inp.value = ''; document.getElementById('addQtyInput').value = '1'; document.getElementById('addPriceInput').value = ''; document.getElementById('addLinkInput').value = ''; document.getElementById('liveInventoryHint').classList.add('hidden'); render(); showToast(`Added ${name}`);
+      });
+      document.getElementById('addQtyMinus').addEventListener('click', () => { const i = document.getElementById('addQtyInput'), d = stepDelta(document.getElementById('addUnitSelect').value); i.value = fmtQty(Math.max(d >= 1 ? 1 : 0.25, (parseFloat(i.value) || 1) - d)); });
+      document.getElementById('addQtyPlus').addEventListener('click', () => { const i = document.getElementById('addQtyInput'), d = stepDelta(document.getElementById('addUnitSelect').value); i.value = fmtQty((parseFloat(i.value) || 0) + d); });
+      document.getElementById('searchInput').addEventListener('input', e => { state.search = e.target.value; render(); });
+      document.querySelectorAll('[data-filter]').forEach(b => b.addEventListener('click', () => { state.filter = b.dataset.filter; render(); }));
+
+      // List Row Interactions (works in both ListView & TodayView!)
+      const handleListInteraction = (container) => {
+        container.addEventListener('change', e => {
+          const sel = e.target.closest('select[data-action="unit"]'); if (!sel) return;
+          const row = sel.closest('[data-item-id]'); if (!row) return;
+          const item = state.items.find(i => i.id === row.dataset.itemId); if (!item) return;
+          item.unit = sel.value; saveAll(); showToast(`${item.name}: ${fmtQty(item.qty)} ${item.unit}`);
+        });
+        container.addEventListener('click', e => {
+          if (e.target.closest('select, a[data-action="openLink"], [data-swipe-action]')) return;
+          const row = e.target.closest('[data-item-id]'), act = e.target.closest('[data-action]'); if (!row || !act) return;
+          const item = state.items.find(i => i.id === row.dataset.itemId); if (!item) return;
+          const a = act.dataset.action;
+          if (a === 'toggle') { haptic(); item.checked = !item.checked; saveAll(); render(); }
+          else if (a === 'inc') { item.qty = Number((item.qty + stepDelta(item.unit)).toFixed(2)); saveAll(); render(); }
+          else if (a === 'dec') { const d = stepDelta(item.unit); if (item.qty - d <= 0) triggerSwipeAction('list', item.id, 'delete'); else { item.qty = Number((item.qty - d).toFixed(2)); saveAll(); render(); } }
+          else if (a === 'edit') openEdit(item.id, 'list');
+        });
+      };
+      handleListInteraction(document.getElementById('listContainer'));
+      handleListInteraction(document.getElementById('todayListBody'));
+      handleListInteraction(document.getElementById('dashboardGrid'));
+
+      // Todo Row Interactions (works in both TodoView & TodayView!)
+      const handleTodoInteraction = (container) => {
+        container.addEventListener('click', e => {
+          if (e.target.closest('[data-swipe-action]')) return;
+          const row = e.target.closest('[data-todo-id]'), act = e.target.closest('[data-todo-action]'); if (!row || !act) return;
+          const t = state.todos.find(x => x.id === row.dataset.todoId); if (!t) return;
+          if (act.dataset.todoAction === 'toggle') { haptic(); t.done = !t.done; saveAll(); render(); }
+          else if (act.dataset.todoAction === 'quickToday') triggerSwipeAction('todo', t.id, 'today');
+        });
+      };
+      handleTodoInteraction(document.getElementById('todoContainer'));
+      handleTodoInteraction(document.getElementById('todayTaskBody'));
+
+      document.getElementById('todoAddForm').addEventListener('submit', e => {
+        e.preventDefault(); const inp = document.getElementById('todoTitleInput'), title = inp.value.trim(); if (!title) return;
+        state.todos.unshift({ id: 't_' + Date.now(), title, priority: document.getElementById('todoPrioritySelect').value, due: document.getElementById('todoDueInput').value.trim(), done: false, forToday: false });
+        saveAll(); inp.value = ''; document.getElementById('todoDueInput').value = ''; render(); showToast('Task added');
+      });
+      document.querySelectorAll('[data-todo-filter]').forEach(b => b.addEventListener('click', () => { state.todoFilter = b.dataset.todoFilter; render(); }));
+      document.getElementById('clearTodoClosedBtn').addEventListener('click', () => { const n = state.todos.filter(t => t.done).length; if (!n) return; const snap = [...state.todos]; state.todos = state.todos.filter(t => !t.done); saveAll(); render(); showToast(`Cleared ${n} closed`, () => { state.todos = snap; saveAll(); render(); }); });
+
+      // Inventory Form & Interactions
+      document.getElementById('invAddForm').addEventListener('submit', e => {
+        e.preventDefault(); const inp = document.getElementById('invNameInput'), name = inp.value.trim(); if (!name) return;
+        const cat = state.activeInvCat !== 'All' ? state.activeInvCat : document.getElementById('invCategorySelect').value;
+        const qty = Math.max(0, parseFloat(document.getElementById('invQtyInput').value) || 0), unit = document.getElementById('invUnitSelect').value;
+        const ex = state.inventory.find(i => i.name.toLowerCase() === name.toLowerCase());
+        if (ex) { ex.qty = Number((ex.qty + qty).toFixed(2)); ex.unit = unit; }
+        else state.inventory.unshift({ id: 'inv_' + Date.now(), name, qty, unit, category: cat, note: '' });
+        saveAll(); inp.value = ''; document.getElementById('invQtyInput').value = '1'; render(); showToast(`Updated inventory: ${name}`);
+      });
+      document.getElementById('invQtyMinus').addEventListener('click', () => { const i = document.getElementById('invQtyInput'), d = stepDelta(document.getElementById('invUnitSelect').value); i.value = fmtQty(Math.max(0, (parseFloat(i.value) || 0) - d)); });
+      document.getElementById('invQtyPlus').addEventListener('click', () => { const i = document.getElementById('invQtyInput'), d = stepDelta(document.getElementById('invUnitSelect').value); i.value = fmtQty((parseFloat(i.value) || 0) + d); });
+      document.getElementById('invSearchInput').addEventListener('input', e => { state.invSearch = e.target.value; render(); });
+      const handleInvInteraction = (container) => {
+        container.addEventListener('change', e => {
+          const sel = e.target.closest('select[data-inv-action="unit"]'); if (!sel) return;
+          const row = sel.closest('[data-inv-id]'); if (!row) return;
+          const item = state.inventory.find(i => i.id === row.dataset.invId); if (!item) return;
+          item.unit = sel.value; saveAll(); showToast(`${item.name}: ${fmtQty(item.qty)} ${item.unit}`);
+        });
+        container.addEventListener('click', e => {
+          if (e.target.closest('select')) return;
+          const row = e.target.closest('[data-inv-id]'), act = e.target.closest('[data-inv-action]'); if (!row || !act) return;
+          const item = state.inventory.find(i => i.id === row.dataset.invId); if (!item) return;
+          const a = act.dataset.invAction;
+          if (a === 'inc') { haptic('tick'); item.qty = Number((item.qty + stepDelta(item.unit)).toFixed(2)); saveAll(); render(); }
+          else if (a === 'dec') { haptic('tick'); item.qty = Math.max(0, Number((item.qty - stepDelta(item.unit)).toFixed(2))); saveAll(); render(); }
+          else if (a === 'toList') { haptic('light'); state.items.unshift({ id: 'i_' + Date.now(), name: item.name, qty: 1, unit: item.unit, category: item.category, note: '', checked: false, forToday: false }); saveAll(); render(); showToast(`Sent ${item.name} to Lists`); }
+          else if (a === 'edit') openEdit(item.id, 'inventory');
+        });
+      };
+      handleInvInteraction(document.getElementById('inventoryContainer'));
+      handleInvInteraction(document.getElementById('invDashboardGrid'));
+
+      // Edit Modal
+      function openEdit(id, target) {
+        const arr = target === 'inventory' ? state.inventory : state.items, item = arr.find(i => i.id === id); if (!item) return;
+        syncUnits(true); syncCategorySelects();
+        document.getElementById('editModalTitle').textContent = target === 'inventory' ? 'Edit Stock Item' : 'Edit List Item';
+        document.getElementById('editItemId').value = item.id; document.getElementById('editItemTarget').value = target;
+        document.getElementById('editItemName').value = item.name; document.getElementById('editItemQty').value = fmtQty(item.qty);
+        document.getElementById('editItemUnit').value = item.unit; document.getElementById('editItemCategory').value = item.category; document.getElementById('editItemNote').value = item.note || '';
+        document.getElementById('editWishFields').classList.toggle('hidden', !(target === 'list' && item.category === 'Wish List'));
+        document.getElementById('editItemPrice').value = item.price || ''; document.getElementById('editItemWishTag').value = item.wishTag || ''; document.getElementById('editItemLink').value = item.link || '';
+        document.getElementById('editModal').classList.remove('hidden');
+      }
+      document.getElementById('editItemForm').addEventListener('submit', e => {
+        e.preventDefault(); const t = document.getElementById('editItemTarget').value, arr = t === 'inventory' ? state.inventory : state.items;
+        const item = arr.find(i => i.id === document.getElementById('editItemId').value); if (!item) return;
+        item.name = document.getElementById('editItemName').value.trim() || item.name; item.qty = Math.max(t === 'inventory' ? 0 : 0.25, parseFloat(document.getElementById('editItemQty').value) || 0);
+        item.unit = document.getElementById('editItemUnit').value; item.category = document.getElementById('editItemCategory').value; item.note = document.getElementById('editItemNote').value.trim();
+        if (t === 'list' && item.category === 'Wish List') { const p = parseFloat(document.getElementById('editItemPrice').value); item.price = Number.isFinite(p) && p > 0 ? p : ''; item.wishTag = document.getElementById('editItemWishTag').value; item.link = normUrl(document.getElementById('editItemLink').value); }
+        saveAll(); document.getElementById('editModal').classList.add('hidden'); render(); showToast('Saved');
+      });
+      document.getElementById('deleteItemModalBtn').addEventListener('click', () => {
+        const t = document.getElementById('editItemTarget').value, id = document.getElementById('editItemId').value;
+        document.getElementById('editModal').classList.add('hidden');
+        if (t === 'inventory') { const snap = [...state.inventory]; state.inventory = state.inventory.filter(i => i.id !== id); saveAll(); render(); showToast('Deleted', () => { state.inventory = snap; saveAll(); render(); }); }
+        else triggerSwipeAction('list', id, 'delete');
+      });
+      document.getElementById('closeEditModal').addEventListener('click', () => document.getElementById('editModal').classList.add('hidden'));
+      document.getElementById('editModal').addEventListener('click', e => { if (e.target.id === 'editModal') e.target.classList.add('hidden'); });
+
+      // Settings Modal
+      const openSettings = () => { closeDrawer(); renderSettingsContent(); document.getElementById('settingsModal').classList.remove('hidden'); };
+      document.getElementById('settingsBtn').addEventListener('click', openSettings);
+      document.getElementById('homeOpenSettingsBtn').addEventListener('click', openSettings);
+      document.getElementById('closeSettingsModal').addEventListener('click', () => document.getElementById('settingsModal').classList.add('hidden'));
+      document.getElementById('doneSettingsBtn').addEventListener('click', () => document.getElementById('settingsModal').classList.add('hidden'));
+      document.getElementById('settingsModal').addEventListener('click', e => { if (e.target.id === 'settingsModal') e.target.classList.add('hidden'); });
+      document.getElementById('fontSizePicker').addEventListener('click', e => { const b = e.target.closest('[data-font-opt]'); if (!b) return; applyFontSize(b.dataset.fontOpt); showToast(`Font: ${b.dataset.fontOpt}`); });
+      document.getElementById('themeColorPicker').addEventListener('click', e => { const b = e.target.closest('[data-theme-color]'); if (!b) return; applyThemeColor(b.dataset.themeColor); renderSettingsContent(); showToast('Theme updated'); });
+      document.getElementById('appIconPicker').addEventListener('click', e => { const b = e.target.closest('[data-app-icon]'); if (!b) return; state.settings.appIcon = b.dataset.appIcon; saveAll(); renderSettingsContent(); render(); showToast('Icon updated'); });
+      document.getElementById('defaultUnitSelect').addEventListener('change', e => { state.settings.defaultUnit = e.target.value; saveAll(); syncUnits(false); });
+      document.getElementById('addUnitForm').addEventListener('submit', e => { e.preventDefault(); const n = document.getElementById('newUnitNameInput').value.trim(); if (!n) return; if (!state.settings.units.some(u => u.name.toLowerCase() === n.toLowerCase())) { state.settings.units.push({ name: n, step: Math.max(0.1, parseFloat(document.getElementById('newUnitStepInput').value) || 1) }); saveAll(); syncUnits(true); renderSettingsContent(); render(); } document.getElementById('newUnitNameInput').value = ''; });
+      document.getElementById('settingsUnitsList').addEventListener('click', e => { const b = e.target.closest('[data-remove-unit]'); if (!b || state.settings.units.length <= 1) return; state.settings.units = state.settings.units.filter(u => u.name !== b.dataset.removeUnit); saveAll(); syncUnits(true); renderSettingsContent(); render(); });
+      document.getElementById('settingsCatColors').addEventListener('click', e => { const b = e.target.closest('[data-color-hex]'); if (!b) return; state.selectedNewColor = b.dataset.colorHex; renderSettingsContent(); });
+      document.getElementById('settingsAddCatForm').addEventListener('submit', e => { e.preventDefault(); const inp = document.getElementById('settingsCatNameInput'), n = inp.value.trim(); if (!n) return; if (!state.categories.some(c => c.name.toLowerCase() === n.toLowerCase())) { state.categories.push({ name: n, color: state.selectedNewColor, icon: 'folder' }); saveAll(); syncCategorySelects(); renderSettingsContent(); render(); } inp.value = ''; });
+      document.getElementById('settingsCategoriesList').addEventListener('click', e => { const b = e.target.closest('[data-remove-cat]'); if (!b || state.categories.length <= 1) return; state.categories = state.categories.filter(c => c.name !== b.dataset.removeCat); saveAll(); syncCategorySelects(); renderSettingsContent(); render(); });
+
+      // Clear / Sample / Copy / Theme / Summary Click
+      document.getElementById('clearCheckedBtn').addEventListener('click', () => { const t = state.items.filter(i => i.checked && (state.activeList === 'All' || i.category === state.activeList)); if (!t.length) return; const ids = new Set(t.map(x => x.id)), snap = [...state.items]; state.items = state.items.filter(i => !ids.has(i.id)); saveAll(); render(); showToast(`Cleared ${t.length} closed`, () => { state.items = snap; saveAll(); render(); }); });
+      document.getElementById('resetSampleBtn').addEventListener('click', () => { state.categories = DEFAULT_CATEGORIES.map(c => ({ ...c })); state.items = SAMPLE_ITEMS.map(i => ({ ...i })); state.inventory = SAMPLE_INVENTORY.map(i => ({ ...i })); state.todos = SAMPLE_TODOS.map(t => ({ ...t })); saveAll(); syncCategorySelects(); render(); showToast('Sample data loaded'); });
+      document.getElementById('copyListBtn').addEventListener('click', () => { const txt = state.items.map(i => `${i.checked ? '[x]' : '[ ]'} ${i.name} — ${fmtQty(i.qty)} ${i.unit} (${i.category})`).join('\n'); if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(txt).then(() => showToast('Copied list')); });
+      document.getElementById('themeToggleBtn').addEventListener('click', () => applyTheme(!document.documentElement.classList.contains('dark')));
+      document.getElementById('toastUndoBtn').addEventListener('click', () => { if (state.lastUndo) { state.lastUndo(); state.lastUndo = null; document.getElementById('toast').classList.add('hidden'); } });
+      document.getElementById('summaryCard1').addEventListener('click', () => { if (state.view === 'home') goList('All'); if (state.view === 'list') { state.filter = 'active'; render(); } else if (state.view === 'todo') { state.todoFilter = 'active'; render(); } });
+      document.getElementById('summaryCard2').addEventListener('click', () => { if (state.view === 'home') goList('All'); if (state.view === 'list') { state.filter = 'checked'; render(); } else if (state.view === 'todo') { state.todoFilter = 'checked'; render(); } });
+
+      // Init
+      state.settings = loadSettings();
+      state.categories = loadJSON(LISTS_KEY, DEFAULT_CATEGORIES);
+      if (!state.categories.length) state.categories = DEFAULT_CATEGORIES.map(c => ({ ...c }));
+      state.items = loadJSON(STORAGE_KEY, SAMPLE_ITEMS);
+      state.inventory = loadJSON(INV_KEY, SAMPLE_INVENTORY);
+      state.todos = loadJSON(TODO_KEY, SAMPLE_TODOS);
+      document.documentElement.style.setProperty('--ios-blue', state.settings.themeColor);
+      applyFontSize(state.settings.fontSize);
+      syncUnits(false);
+      syncCategorySelects();
+      let dark = false; try { const t = localStorage.getItem(THEME_KEY); dark = t ? t === 'dark' : (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches); } catch (e) {}
+      applyTheme(dark);
+      render();
+    })();
+  </script>
+
+  <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', function () {
+        navigator.serviceWorker.register('./sw.js').catch(function () {});
+      });
+    }
+  </script>
+
+</body>
+</html>
