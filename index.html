@@ -747,7 +747,11 @@
         </div>
       </div>
 
-      <div class="p-3 border-t ios-divider">
+      <div class="p-3 border-t ios-divider space-y-2">
+        <div id="offlineStatusPill" class="px-3 py-1.5 rounded-lg fs-xs font-semibold flex items-center justify-between" style="background-color: var(--bg-input); color: var(--text-secondary);">
+          <span>Offline Mode</span>
+          <span id="offlineStatusText">Checking...</span>
+        </div>
         <button id="settingsBtn" type="button" class="w-full flex items-center justify-between px-3 py-2.5 rounded-xl fs-body font-semibold transition hover:opacity-90" style="background-color: var(--bg-input); color: var(--text-primary);">
           <span class="flex items-center gap-2.5"><i data-lucide="settings" class="w-4 h-4" style="color: var(--ios-blue);"></i><span>App Settings</span></span>
           <i data-lucide="chevron-right" class="w-4 h-4" style="color: var(--text-tertiary);"></i>
@@ -976,7 +980,7 @@
   </main>
 
   <!-- Hidden native iOS Safari Taptic Engine Haptic Switch (iOS 17.4+ / 18 / 26) -->
-  <label id="iosHapticLabel" aria-hidden="true" style="position:fixed;left:-9999px;top:-9999px;width:1px;height:1px;opacity:0;pointer-events:none;overflow:hidden;">
+  <label id="iosHapticLabel" for="iosHapticSwitch" aria-hidden="true" style="position:fixed;bottom:0;left:0;width:24px;height:24px;opacity:0.001;z-index:-1;overflow:hidden;">
     <input id="iosHapticSwitch" type="checkbox" switch tabindex="-1" />
   </label>
 
@@ -1215,7 +1219,7 @@
           if (lbl) lbl.click();
         } catch (e) {}
         try {
-          if (navigator.vibrate) navigator.vibrate(style === 'tick' ? 6 : style === 'heavy' ? 16 : 10);
+          if (navigator.vibrate) navigator.vibrate(style === 'tick' ? 8 : style === 'heavy' ? 18 : 12);
         } catch (e) {}
       }
       function findInv(name) { const c = name.trim().toLowerCase(); if (!c) return null; return state.inventory.find(i => i.name.toLowerCase() === c) || state.inventory.find(i => i.name.toLowerCase().includes(c) || c.includes(i.name.toLowerCase())); }
@@ -1441,7 +1445,6 @@
           sliderPhys.lastVisualIdx = visualIdx;
           for (let i = 0; i < dockTabs.length; i++) dockTabs[i].classList.toggle('active', i === visualIdx);
           for (let i = 0; i < loupeTabs.length; i++) loupeTabs[i].classList.toggle('active', i === visualIdx);
-          if (sliderPhys.dragging) haptic('tick');
         }
       }
 
@@ -2018,10 +2021,17 @@
         if (!islandDrag.active || e.pointerId !== islandDrag.pid) return;
         if (!islandDrag.moved && Math.abs(e.clientX - islandDrag.sx) > 3) {
           islandDrag.moved = true;
+          islandDrag.lastSeg = activeIslandIndex();
           haptic('tick');
         }
         if (islandDrag.moved) {
-          sliderPhys.targetPct = pctFromClientX(e.clientX);
+          const nextPct = pctFromClientX(e.clientX);
+          const nextSeg = Math.max(0, Math.min(3, Math.round(nextPct / 100)));
+          if (nextSeg !== islandDrag.lastSeg) {
+            islandDrag.lastSeg = nextSeg;
+            haptic('tick');
+          }
+          sliderPhys.targetPct = nextPct;
           ensureSliderLoop();
         }
       });
@@ -2346,11 +2356,42 @@
   </script>
 
   <script>
-    if ('serviceWorker' in navigator) {
+    (function () {
+      const txt = document.getElementById('offlineStatusText');
+      const setStatus = (msg, ok) => {
+        if (!txt) return;
+        txt.textContent = msg;
+        txt.style.color = ok ? 'var(--ios-green)' : 'var(--ios-orange)';
+      };
+      if (!('serviceWorker' in navigator)) {
+        setStatus('Not supported', false);
+        return;
+      }
+      if (navigator.serviceWorker.controller) {
+        setStatus('Ready ✓', true);
+      } else {
+        setStatus('Caching...', false);
+      }
       window.addEventListener('load', function () {
-        navigator.serviceWorker.register('./sw.js').catch(function () {});
+        navigator.serviceWorker.register('./sw.js', { scope: './' }).then(function (reg) {
+          if (navigator.serviceWorker.controller) {
+            setStatus('Ready ✓', true);
+          } else {
+            const active = reg.installing || reg.waiting || reg.active;
+            if (active) {
+              active.addEventListener('statechange', function () {
+                if (active.state === 'activated') setStatus('Ready ✓ (reopen once)', true);
+              });
+            }
+          }
+        }).catch(function () {
+          setStatus('Unavailable', false);
+        });
       });
-    }
+      navigator.serviceWorker.addEventListener('controllerchange', function () {
+        setStatus('Ready ✓', true);
+      });
+    })();
   </script>
 
 </body>
