@@ -1,0 +1,782 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, maximum-scale=1.0, user-scalable=no" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+  <meta name="apple-mobile-web-app-title" content="FreshCart" />
+  <meta name="theme-color" content="#F2F2F7" />
+  <link rel="manifest" href="./manifest.webmanifest" />
+  <link rel="apple-touch-icon" href="./icon-192.png" />
+  <title>FreshCart — Offline Lists, Inventory & Notepad</title>
+  <style>
+    :root {
+      --bg-page: #F2F2F7; --bg-card: #FFFFFF; --bg-secondary: #E5E5EA; --bg-input: #EFEFF4;
+      --text-primary: #1C1C1E; --text-secondary: #6E6E73; --text-tertiary: #8E8E93;
+      --border-hairline: rgba(60, 60, 67, 0.12);
+      --ios-blue: #007AFF; --ios-green: #34C759; --ios-orange: #FF9500; --ios-red: #FF3B30;
+      --nav-blur: rgba(242, 242, 247, 0.92);
+      --fs-title: 14px; --fs-body: 12px; --fs-sub: 10.5px; --fs-xs: 9.5px;
+    }
+    html[data-font-size="medium"] { --fs-title: 15.5px; --fs-body: 13.5px; --fs-sub: 11.5px; --fs-xs: 10.5px; }
+    html[data-font-size="large"]  { --fs-title: 17px; --fs-body: 15px; --fs-sub: 12.5px; --fs-xs: 11px; }
+    html.dark {
+      --bg-page: #000000; --bg-card: #1C1C1E; --bg-secondary: #2C2C2E; --bg-input: #2C2C2E;
+      --text-primary: #F2F2F7; --text-secondary: #AEAEB2; --text-tertiary: #8E8E93;
+      --border-hairline: rgba(255, 255, 255, 0.12);
+      --ios-green: #30D158; --ios-orange: #FF9F0A; --ios-red: #FF453A;
+      --nav-blur: rgba(28, 28, 30, 0.92);
+    }
+    * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display", system-ui, sans-serif;
+      font-size: var(--fs-body); background: var(--bg-page); color: var(--text-primary);
+      margin: 0; min-height: 100dvh; padding-bottom: calc(56px + env(safe-area-inset-bottom));
+      transition: background-color 0.2s ease, color 0.2s ease;
+    }
+    button, input, select, textarea { font-family: inherit; color: inherit; }
+    button { cursor: pointer; border: none; background: transparent; padding: 0; }
+    input, select, textarea { border: none; outline: none; }
+    .container { max-width: 460px; margin: 0 auto; padding-left: 14px; padding-right: 14px; }
+
+    header {
+      position: sticky; top: 0; z-index: 30; background: var(--nav-blur);
+      backdrop-filter: saturate(180%) blur(20px); -webkit-backdrop-filter: saturate(180%) blur(20px);
+      border-bottom: 0.5px solid var(--border-hairline);
+      padding-top: calc(10px + env(safe-area-inset-top)); padding-bottom: 10px;
+    }
+    .header-top { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+    .header-left { display: flex; align-items: center; gap: 8px; min-width: 0; }
+    .header-badge { width: 28px; height: 28px; border-radius: 8px; background: var(--ios-blue); color: #FFF; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+    .header-title { font-size: var(--fs-title); font-weight: 700; margin: 0; line-height: 1.2; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .header-sub { font-size: var(--fs-sub); color: var(--text-secondary); margin: 0; font-weight: 500; }
+    .header-actions { display: flex; align-items: center; gap: 4px; flex-shrink: 0; }
+    .icon-btn { width: 30px; height: 30px; border-radius: 999px; display: inline-flex; align-items: center; justify-content: center; color: var(--ios-blue); }
+    .back-btn { display: inline-flex; align-items: center; gap: 2px; font-size: var(--fs-sub); font-weight: 600; color: var(--ios-blue); padding: 4px 6px; border-radius: 8px; }
+
+    .drawer-overlay { position: fixed; inset: 0; z-index: 40; }
+    .drawer-backdrop { position: absolute; inset: 0; background: rgba(0,0,0,0.45); backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px); }
+    .drawer-panel {
+      position: relative; z-index: 10; width: 285px; max-width: 84vw; height: 100%;
+      background: var(--bg-card); border-right: 0.5px solid var(--border-hairline);
+      display: flex; flex-direction: column; box-shadow: 4px 0 24px rgba(0,0,0,0.18);
+      transform: translateX(-100%); transition: transform 0.24s cubic-bezier(0.16, 1, 0.3, 1);
+      padding-top: env(safe-area-inset-top); padding-bottom: env(safe-area-inset-bottom);
+    }
+    .drawer-overlay.open .drawer-panel { transform: translateX(0); }
+    .drawer-head { padding: 14px 16px; border-bottom: 0.5px solid var(--border-hairline); display: flex; align-items: center; justify-content: space-between; }
+    .drawer-body { flex: 1; overflow-y: auto; padding: 12px; display: flex; flex-direction: column; gap: 12px; }
+    .drawer-item { width: 100%; display: flex; align-items: center; justify-content: space-between; padding: 8px 10px; border-radius: 10px; font-size: var(--fs-body); font-weight: 600; }
+    .drawer-badge { font-size: var(--fs-xs); font-weight: 600; padding: 2px 7px; border-radius: 999px; background: var(--bg-input); color: var(--text-secondary); }
+    .notepad-wrap { flex: 1; display: flex; flex-direction: column; padding-top: 10px; border-top: 0.5px solid var(--border-hairline); min-height: 200px; }
+    .notepad-area { flex: 1; width: 100%; background: var(--bg-input); color: var(--text-primary); border-radius: 11px; padding: 10px; font-size: var(--fs-sub); line-height: 1.5; resize: none; }
+    .drawer-foot { padding: 12px; border-top: 0.5px solid var(--border-hairline); }
+    .drawer-settings-btn { width: 100%; display: flex; align-items: center; justify-content: space-between; padding: 10px 12px; border-radius: 11px; background: var(--bg-input); font-size: var(--fs-body); font-weight: 600; }
+
+    main { padding-top: 12px; }
+    .summary-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 12px; }
+    .summary-card { background: var(--bg-card); border: 0.5px solid var(--border-hairline); border-radius: 13px; padding: 10px 13px; text-align: left; display: flex; align-items: center; justify-content: space-between; box-shadow: 0 1px 2px rgba(0,0,0,0.03); }
+    .summary-num { font-size: 20px; font-weight: 700; line-height: 1.1; margin-top: 2px; }
+
+    .dash-head { display: flex; justify-content: space-between; align-items: center; gap: 6px; margin-bottom: 10px; }
+    .dash-grid { display: flex; flex-direction: column; gap: 10px; }
+    .dash-tile {
+      background: var(--bg-card); border: 0.5px solid var(--border-hairline); border-radius: 14px;
+      padding: 12px 14px 12px 16px; width: 100%; text-align: left;
+      display: flex; align-items: center; justify-content: space-between; gap: 12px;
+      position: relative; overflow: hidden; box-shadow: 0 1px 3px rgba(0,0,0,0.03);
+    }
+    .dash-bar { position: absolute; top: 0; bottom: 0; left: 0; width: 4px; }
+    .dash-num { font-size: 18px; font-weight: 700; line-height: 1; }
+    .dash-lbl { font-size: var(--fs-xs); font-weight: 700; text-transform: uppercase; letter-spacing: 0.04em; color: var(--text-tertiary); margin-top: 2px; }
+    .dash-name { font-size: var(--fs-body); font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .dash-preview { font-size: var(--fs-xs); color: var(--text-secondary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-top: 2px; }
+
+    .card { background: var(--bg-card); border-radius: 13px; border: 0.5px solid var(--border-hairline); box-shadow: 0 1px 2px rgba(0,0,0,0.03); }
+    .add-card { padding: 10px; display: flex; flex-direction: column; gap: 8px; }
+    .add-row { display: flex; gap: 6px; align-items: center; }
+    .input-field { background: var(--bg-input); color: var(--text-primary); border-radius: 8px; padding: 8px 10px; font-size: var(--fs-body); width: 100%; }
+    .input-field::placeholder { color: var(--text-tertiary); }
+    .primary-btn { background: var(--ios-blue); color: #FFF; font-weight: 600; font-size: var(--fs-body); padding: 8px 12px; border-radius: 8px; display: inline-flex; align-items: center; gap: 4px; flex-shrink: 0; }
+    .hint-bar { display: flex; justify-content: space-between; align-items: center; padding: 6px 10px; border-radius: 8px; font-size: var(--fs-xs); font-weight: 600; }
+
+    .controls-row { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; }
+    .stepper { display: inline-flex; align-items: center; background: var(--bg-input); border: 0.5px solid var(--border-hairline); border-radius: 999px; padding: 2px; }
+    .stepper-btn { width: 23px; height: 23px; border-radius: 999px; display: inline-flex; align-items: center; justify-content: center; color: var(--ios-blue); font-weight: 700; font-size: 14px; }
+    .qty-input { width: 38px; text-align: center; background: transparent; font-size: var(--fs-sub); font-weight: 600; }
+    .select-field { background: var(--bg-input); color: var(--text-primary); border-radius: 8px; padding: 6px 8px; font-size: var(--fs-sub); font-weight: 500; }
+    .cat-select { flex: 1; min-width: 105px; }
+    .inline-unit-select { background: transparent; color: var(--text-secondary); font-size: var(--fs-xs); font-weight: 500; padding: 0 2px; max-width: 62px; cursor: pointer; }
+
+    .scroll-row { display: flex; align-items: center; gap: 6px; overflow-x: auto; scrollbar-width: none; }
+    .scroll-row::-webkit-scrollbar { display: none; }
+    .staples-wrap { padding-top: 8px; border-top: 0.5px solid var(--border-hairline); }
+    .staple-label { font-size: var(--fs-xs); font-weight: 700; text-transform: uppercase; letter-spacing: 0.04em; color: var(--text-tertiary); flex-shrink: 0; }
+    .staple-btn { background: var(--bg-input); color: var(--text-primary); border-radius: 999px; padding: 3px 8px; font-size: var(--fs-sub); font-weight: 500; flex-shrink: 0; }
+
+    .search-row { display: flex; gap: 6px; align-items: center; }
+    .search-wrap { position: relative; flex: 1; }
+    .search-icon { position: absolute; left: 9px; top: 50%; transform: translateY(-50%); color: var(--text-tertiary); pointer-events: none; }
+    .search-input { padding: 7px 10px 7px 28px; font-size: var(--fs-sub); }
+    .toggle-btn { background: var(--bg-card); border: 0.5px solid var(--border-hairline); border-radius: 10px; padding: 6px 9px; font-size: var(--fs-sub); font-weight: 600; flex-shrink: 0; }
+
+    .segmented { display: grid; grid-template-columns: repeat(3, 1fr); background: var(--bg-secondary); border-radius: 9px; padding: 2px; margin-top: 8px; }
+    .seg-btn { padding: 5px 4px; border-radius: 7px; font-size: var(--fs-sub); font-weight: 600; color: var(--text-secondary); }
+    .seg-btn.active { background: var(--bg-card); color: var(--text-primary); box-shadow: 0 1px 2px rgba(0,0,0,0.1); }
+
+    .group-block { display: flex; flex-direction: column; gap: 5px; }
+    .group-header { display: flex; align-items: center; justify-content: space-between; padding: 0 4px; }
+    .group-title-btn { display: inline-flex; align-items: center; gap: 6px; font-size: var(--fs-xs); font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-secondary); }
+    .dot { width: 7px; height: 7px; border-radius: 999px; display: inline-block; flex-shrink: 0; }
+    .group-count { font-size: var(--fs-xs); color: var(--text-tertiary); font-weight: 600; }
+
+    .item-row { display: flex; align-items: center; gap: 8px; padding: 8px 11px; border-bottom: 0.5px solid var(--border-hairline); }
+    .item-row:last-child { border-bottom: none; }
+    .check-circle { width: 20px; height: 20px; border-radius: 999px; border: 1.75px solid var(--text-tertiary); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+    .check-circle.checked { background: var(--ios-green); border-color: var(--ios-green); color: #FFF; }
+    .to-list-btn { width: 26px; height: 26px; border-radius: 7px; background: var(--bg-input); color: var(--ios-blue); display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0; font-size: 12px; font-weight: 700; }
+    .item-main { flex: 1; min-width: 0; text-align: left; }
+    .item-name { font-size: var(--fs-body); font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; display: block; }
+    .item-name.checked { text-decoration: line-through; opacity: 0.5; }
+    .item-meta { display: flex; flex-wrap: wrap; align-items: center; gap: 4px; font-size: var(--fs-xs); color: var(--text-secondary); margin-top: 2px; }
+    .qty-label { padding: 0 3px; font-size: var(--fs-sub); font-weight: 600; text-align: center; }
+
+    .empty-card { padding: 28px 16px; text-align: center; }
+    .empty-title { font-size: var(--fs-body); font-weight: 600; margin: 8px 0 4px; }
+    .empty-desc { font-size: var(--fs-sub); color: var(--text-secondary); margin: 0; }
+
+    .footer-row { display: flex; justify-content: space-between; align-items: center; font-size: var(--fs-sub); color: var(--text-secondary); padding-top: 8px; }
+    .footer-btn { display: inline-flex; align-items: center; gap: 4px; padding: 5px 8px; border-radius: 8px; font-weight: 500; }
+    .footer-btn:disabled { opacity: 0.35; }
+    .danger-text { color: var(--ios-red); }
+
+    .modal-backdrop { position: fixed; inset: 0; z-index: 50; background: rgba(0,0,0,0.45); backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px); display: flex; align-items: flex-end; justify-content: center; }
+    @media (min-width: 520px) { .modal-backdrop { align-items: center; padding: 16px; } }
+    .modal-sheet { width: 100%; max-width: 400px; max-height: 88dvh; overflow-y: auto; padding: 16px; border-radius: 16px 16px 0 0; display: flex; flex-direction: column; gap: 12px; padding-bottom: calc(16px + env(safe-area-inset-bottom)); }
+    @media (min-width: 520px) { .modal-sheet { border-radius: 16px; } }
+    .modal-head { display: flex; justify-content: space-between; align-items: center; }
+    .modal-title { font-size: var(--fs-title); font-weight: 700; margin: 0; }
+    .close-btn { width: 26px; height: 26px; border-radius: 999px; background: var(--bg-input); color: var(--text-secondary); display: inline-flex; align-items: center; justify-content: center; }
+    .field-label { display: block; font-size: var(--fs-xs); font-weight: 700; text-transform: uppercase; letter-spacing: 0.04em; color: var(--text-secondary); margin-bottom: 4px; }
+    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    .icon-grid { display: grid; grid-template-columns: repeat(6, 1fr); gap: 6px; }
+    .icon-choice { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; padding: 7px 2px; border-radius: 10px; background: var(--bg-input); border: 0.5px solid var(--border-hairline); font-size: 9px; font-weight: 600; }
+    .icon-choice.active { background: var(--ios-blue); color: #FFF; border-color: transparent; }
+    .color-row { display: flex; gap: 8px; flex-wrap: wrap; }
+    .color-dot { width: 24px; height: 24px; border-radius: 999px; border: 2px solid transparent; }
+    .color-dot.selected { transform: scale(1.12); box-shadow: 0 0 0 2px var(--bg-card), 0 0 0 4px var(--ios-blue); }
+    .modal-actions { display: flex; gap: 8px; padding-top: 4px; }
+    .danger-btn { background: rgba(255,59,48,0.12); color: var(--ios-red); font-weight: 600; font-size: var(--fs-sub); padding: 9px 14px; border-radius: 9px; }
+    .full-btn { flex: 1; justify-content: center; font-size: var(--fs-sub); padding: 9px 14px; border-radius: 9px; }
+    .chip-wrap { display: flex; flex-wrap: wrap; gap: 6px; }
+    .chip { display: inline-flex; align-items: center; gap: 5px; background: var(--bg-input); padding: 4px 9px; border-radius: 999px; font-size: var(--fs-xs); font-weight: 500; }
+    .chip-rm { color: var(--ios-red); font-weight: 700; margin-left: 2px; }
+    .section-sep { padding-top: 10px; border-top: 0.5px solid var(--border-hairline); display: flex; flex-direction: column; gap: 8px; }
+    .toast { position: fixed; bottom: calc(16px + env(safe-area-inset-bottom)); left: 50%; transform: translateX(-50%); z-index: 60; background: rgba(28, 28, 30, 0.95); color: #FFF; border: 1px solid rgba(255,255,255,0.12); border-radius: 999px; padding: 8px 14px; font-size: var(--fs-sub); font-weight: 500; display: flex; align-items: center; gap: 10px; box-shadow: 0 6px 20px rgba(0,0,0,0.25); }
+    .undo-btn { color: #60A5FA; font-weight: 700; font-size: var(--fs-sub); }
+    .hidden { display: none !important; }
+    .opacity-85 { opacity: 0.85; }
+    .opacity-60 { opacity: 0.6; }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="container">
+      <div class="header-top">
+        <div class="header-left">
+          <button id="openDrawerBtn" type="button" class="icon-btn" aria-label="Menu" title="Menu, Notepad & Settings">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+          </button>
+          <button id="backHomeBtn" type="button" class="back-btn hidden">‹ Home</button>
+          <div id="headerBadge" class="header-badge"></div>
+          <div style="min-width:0;">
+            <h1 id="headerTitle" class="header-title">FreshCart</h1>
+            <p id="headerSubtitle" class="header-sub">0 pending items</p>
+          </div>
+        </div>
+        <div class="header-actions">
+          <button id="copyListBtn" type="button" class="icon-btn" title="Copy list">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg>
+          </button>
+          <button id="themeToggleBtn" type="button" class="icon-btn" style="color:var(--text-secondary);" title="Toggle Dark Mode">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/></svg>
+          </button>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Left Drawer (Navigation + Notepad + Settings) -->
+  <div id="drawerOverlay" class="drawer-overlay hidden">
+    <div id="drawerBackdrop" class="drawer-backdrop"></div>
+    <aside class="drawer-panel">
+      <div class="drawer-head">
+        <div style="display:flex;align-items:center;gap:8px;">
+          <div id="drawerAppBadge" class="header-badge"></div>
+          <span style="font-size:var(--fs-title);font-weight:700;">FreshCart</span>
+        </div>
+        <button id="closeDrawerBtn" type="button" class="close-btn">✕</button>
+      </div>
+      <div class="drawer-body">
+        <div style="display:flex;flex-direction:column;gap:4px;">
+          <button id="navHomeBtn" type="button" class="drawer-item"><span>Home Dashboard</span><span id="drawerTotalPending" class="drawer-badge">0</span></button>
+          <button id="navAllListsBtn" type="button" class="drawer-item"><span>All Lists</span><span id="drawerAllCount" class="drawer-badge">0</span></button>
+          <button id="navInventoryBtn" type="button" class="drawer-item"><span>Inventory</span><span id="drawerInvCount" class="drawer-badge">0</span></button>
+        </div>
+        <div class="notepad-wrap">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;padding:0 2px;">
+            <span class="field-label" style="margin:0;">Notepad</span>
+            <button id="clearNotepadBtn" type="button" style="font-size:var(--fs-xs);font-weight:600;color:var(--ios-red);">Clear</button>
+          </div>
+          <textarea id="drawerNotepad" class="notepad-area" placeholder="Jot down quick notes, recipes, store reminders..."></textarea>
+        </div>
+      </div>
+      <div class="drawer-foot">
+        <button id="settingsBtn" type="button" class="drawer-settings-btn"><span>⚙ App Settings</span><span style="color:var(--text-tertiary);">›</span></button>
+      </div>
+    </aside>
+  </div>
+
+  <main class="container">
+    <section class="summary-grid">
+      <button id="summaryPendingCard" type="button" class="summary-card">
+        <div><div id="summaryCard1Label" class="field-label" style="margin:0;">Pending</div><div id="summaryPendingCount" class="summary-num">0</div></div>
+        <span class="dot" style="width:10px;height:10px;background:#FF9500;"></span>
+      </button>
+      <button id="summaryClosedCard" type="button" class="summary-card">
+        <div><div id="summaryCard2Label" class="field-label" style="margin:0;">Closed</div><div id="summaryClosedCount" class="summary-num" style="color:var(--ios-green);">0</div></div>
+        <span class="dot" style="width:10px;height:10px;background:var(--ios-green);"></span>
+      </button>
+    </section>
+
+    <!-- Home Dashboard View -->
+    <section id="homeView">
+      <div class="dash-head">
+        <div>
+          <h2 style="font-size:var(--fs-title);font-weight:700;margin:0;">Categories Overview</h2>
+          <p style="font-size:var(--fs-sub);color:var(--text-secondary);margin:2px 0 0;">Tap a category to open its list</p>
+        </div>
+        <div style="display:flex;gap:6px;flex-shrink:0;">
+          <button id="homeOpenInventoryBtn" type="button" class="toggle-btn" style="color:var(--ios-green);">Inventory</button>
+          <button id="homeOpenAllBtn" type="button" class="toggle-btn" style="color:var(--ios-blue);">All Items</button>
+        </div>
+      </div>
+      <div id="dashboardGrid" class="dash-grid"></div>
+      <div class="footer-row">
+        <button id="homeOpenSettingsBtn" type="button" class="footer-btn" style="color:var(--ios-blue);">Manage Categories</button>
+        <span id="offlineStatus" style="font-size:10px;opacity:0.75;">Offline-Ready</span>
+        <button id="resetSampleBtn" type="button" class="footer-btn">Load Sample</button>
+      </div>
+    </section>
+
+    <!-- List View -->
+    <section id="listView" class="hidden" style="display:flex;flex-direction:column;gap:12px;">
+      <section class="card add-card">
+        <form id="quickAddForm" style="display:flex;flex-direction:column;gap:8px;">
+          <div class="add-row">
+            <input id="itemNameInput" type="text" autocomplete="off" class="input-field" placeholder="Add item to this list..." />
+            <button type="submit" class="primary-btn">+ Add</button>
+          </div>
+          <div id="liveInventoryHint" class="hint-bar hidden"></div>
+          <div class="controls-row">
+            <div class="stepper">
+              <button id="addQtyMinus" type="button" class="stepper-btn">−</button>
+              <input id="addQtyInput" type="number" min="0.25" step="any" value="1" class="qty-input" />
+              <button id="addQtyPlus" type="button" class="stepper-btn">+</button>
+            </div>
+            <select id="addUnitSelect" class="select-field"></select>
+            <select id="addCategorySelect" class="select-field cat-select"></select>
+          </div>
+          <div id="wishExtraFields" class="hidden" style="display:flex;flex-direction:column;gap:6px;padding-top:6px;border-top:0.5px solid var(--border-hairline);">
+            <div class="grid-2" style="gap:6px;">
+              <input id="addPriceInput" type="number" min="0" step="any" class="input-field" style="padding:6px 8px;" placeholder="₹ Price (optional)" />
+              <select id="addWishTagSelect" class="select-field"></select>
+            </div>
+            <input id="addLinkInput" type="url" class="input-field" style="padding:6px 8px;" placeholder="Product link (https://...)" />
+          </div>
+        </form>
+        <div class="staples-wrap"><div id="quickStaples" class="scroll-row"></div></div>
+      </section>
+
+      <section>
+        <div class="search-row">
+          <div class="search-wrap">
+            <svg class="search-icon" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+            <input id="searchInput" type="search" class="input-field search-input" placeholder="Search items..." />
+          </div>
+          <button id="groupToggleBtn" type="button" class="toggle-btn"><span id="groupToggleLabel">Grouped</span></button>
+        </div>
+        <div class="segmented" role="tablist">
+          <button type="button" data-filter="all" class="seg-btn active">All (<span id="countAll">0</span>)</button>
+          <button type="button" data-filter="active" class="seg-btn">Pending (<span id="countActive">0</span>)</button>
+          <button type="button" data-filter="checked" class="seg-btn">Closed (<span id="countChecked">0</span>)</button>
+        </div>
+      </section>
+
+      <section id="listContainer" style="display:flex;flex-direction:column;gap:12px;" aria-live="polite"></section>
+      <section id="emptyState" class="card empty-card hidden"><h2 id="emptyTitle" class="empty-title">This list is empty</h2><p id="emptyDesc" class="empty-desc">Add an item above with its quantity and unit.</p></section>
+      <section class="footer-row">
+        <button id="clearCheckedBtn" type="button" class="footer-btn danger-text">Clear Closed</button>
+        <button id="listBackDashBtn" type="button" class="footer-btn" style="color:var(--ios-blue);">Dashboard</button>
+      </section>
+    </section>
+
+    <!-- Inventory View -->
+    <section id="inventoryView" class="hidden" style="display:flex;flex-direction:column;gap:12px;">
+      <section class="card add-card">
+        <form id="invAddForm" style="display:flex;flex-direction:column;gap:8px;">
+          <div class="add-row">
+            <input id="invNameInput" type="text" autocomplete="off" class="input-field" placeholder="Add item to home inventory..." />
+            <button type="submit" class="primary-btn" style="background:var(--ios-green);">+ Add</button>
+          </div>
+          <div class="controls-row">
+            <div class="stepper">
+              <button id="invQtyMinus" type="button" class="stepper-btn">−</button>
+              <input id="invQtyInput" type="number" min="0" step="any" value="1" class="qty-input" />
+              <button id="invQtyPlus" type="button" class="stepper-btn">+</button>
+            </div>
+            <select id="invUnitSelect" class="select-field"></select>
+            <select id="invCategorySelect" class="select-field cat-select"></select>
+          </div>
+        </form>
+      </section>
+      <div class="search-wrap">
+        <svg class="search-icon" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+        <input id="invSearchInput" type="search" class="input-field search-input" placeholder="Search inventory..." />
+      </div>
+      <section id="inventoryContainer" style="display:flex;flex-direction:column;gap:12px;" aria-live="polite"></section>
+      <section id="invEmptyState" class="card empty-card hidden"><h2 class="empty-title">Inventory is empty</h2><p class="empty-desc">Add what you currently have at home so shopping lists show live stock.</p></section>
+    </section>
+  </main>
+
+  <!-- Settings Modal -->
+  <div id="settingsModal" class="modal-backdrop hidden">
+    <div class="card modal-sheet">
+      <div class="modal-head"><h2 class="modal-title">App Settings</h2><button id="closeSettingsModal" type="button" class="close-btn">✕</button></div>
+      <div><label class="field-label">Font Size</label><div class="segmented" id="fontSizePicker" style="margin-top:0;"><button type="button" data-font-opt="small" class="seg-btn">Small</button><button type="button" data-font-opt="medium" class="seg-btn">Medium</button><button type="button" data-font-opt="large" class="seg-btn">Large</button></div></div>
+      <div class="section-sep"><label class="field-label" style="margin:0;">Theme Color</label><div id="themeColorPicker" class="color-row"></div></div>
+      <div class="section-sep"><label class="field-label" style="margin:0;">App Icon</label><div id="appIconPicker" class="icon-grid"></div></div>
+      <div class="section-sep">
+        <label class="field-label" style="margin:0;">Categories (Add / Remove)</label>
+        <div id="settingsCategoriesList" class="chip-wrap"></div>
+        <form id="settingsAddCatForm" style="display:flex;flex-direction:column;gap:8px;">
+          <div style="display:flex;gap:6px;"><input id="settingsCatNameInput" type="text" maxlength="28" class="input-field" style="padding:6px 8px;" placeholder="New category..." /><button type="submit" class="primary-btn" style="padding:6px 10px;">Add</button></div>
+          <div id="settingsCatColors" class="color-row"></div>
+        </form>
+      </div>
+      <div class="section-sep">
+        <div style="display:flex;justify-content:space-between;align-items:center;"><label class="field-label" style="margin:0;">Quantity Units</label><div style="display:flex;align-items:center;gap:5px;"><span style="font-size:var(--fs-xs);color:var(--text-secondary);">Default:</span><select id="defaultUnitSelect" class="select-field" style="padding:4px 6px;font-size:var(--fs-xs);"></select></div></div>
+        <div id="settingsUnitsList" class="chip-wrap"></div>
+        <form id="addUnitForm" style="display:flex;gap:6px;"><input id="newUnitNameInput" type="text" maxlength="14" class="input-field" style="padding:6px 8px;" placeholder="Add unit..." /><input id="newUnitStepInput" type="number" min="0.1" step="any" value="1" class="input-field" style="width:58px;padding:6px;text-align:center;" /><button type="submit" class="primary-btn" style="padding:6px 10px;">Add</button></form>
+      </div>
+      <button id="doneSettingsBtn" type="button" class="primary-btn full-btn">Done</button>
+    </div>
+  </div>
+
+  <!-- Edit Modal -->
+  <div id="editModal" class="modal-backdrop hidden">
+    <div class="card modal-sheet">
+      <div class="modal-head"><h2 id="editModalTitle" class="modal-title">Edit Item</h2><button id="closeEditModal" type="button" class="close-btn">✕</button></div>
+      <form id="editItemForm" style="display:flex;flex-direction:column;gap:10px;">
+        <input type="hidden" id="editItemId" /><input type="hidden" id="editItemTarget" value="list" />
+        <div><label for="editItemName" class="field-label">Item Name</label><input id="editItemName" type="text" required class="input-field" /></div>
+        <div class="grid-2">
+          <div><label for="editItemQty" class="field-label">Quantity</label><input id="editItemQty" type="number" min="0" step="any" required class="input-field" /></div>
+          <div><label for="editItemUnit" class="field-label">Unit</label><select id="editItemUnit" class="select-field" style="width:100%;padding:8px;"></select></div>
+        </div>
+        <div><label for="editItemCategory" class="field-label">Category</label><select id="editItemCategory" class="select-field" style="width:100%;padding:8px;"></select></div>
+        <div id="editWishFields" class="hidden" style="display:flex;flex-direction:column;gap:8px;padding-top:6px;border-top:0.5px solid var(--border-hairline);">
+          <div class="grid-2">
+            <div><label for="editItemPrice" class="field-label">Price (₹)</label><input id="editItemPrice" type="number" min="0" step="any" class="input-field" placeholder="0" /></div>
+            <div><label for="editItemWishTag" class="field-label">Item Category</label><select id="editItemWishTag" class="select-field" style="width:100%;padding:8px;"></select></div>
+          </div>
+          <div><label for="editItemLink" class="field-label">Product Link (URL)</label><input id="editItemLink" type="url" class="input-field" placeholder="https://..." /></div>
+        </div>
+        <div><label for="editItemNote" class="field-label">Note (Optional)</label><input id="editItemNote" type="text" class="input-field" placeholder="Brand, shelf, size..." /></div>
+        <div class="modal-actions"><button id="deleteItemModalBtn" type="button" class="danger-btn">Delete</button><button type="submit" class="primary-btn full-btn">Save Changes</button></div>
+      </form>
+    </div>
+  </div>
+
+  <div id="toast" class="toast hidden"><span id="toastMessage">Saved</span><button id="toastUndoBtn" type="button" class="undo-btn hidden">Undo</button></div>
+
+  <script>
+    (function () {
+      if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+          navigator.serviceWorker.register('./sw.js').then(() => { const el = document.getElementById('offlineStatus'); if (el) el.textContent = '100% Offline Ready'; }).catch(() => {});
+        });
+      }
+
+      const STORAGE_KEY = 'freshcart_offline_items_v6', INV_KEY = 'freshcart_offline_inv_v6', LISTS_KEY = 'freshcart_offline_lists_v6', SETTINGS_KEY = 'freshcart_offline_settings_v6', NOTEPAD_KEY = 'freshcart_offline_notepad_v6', THEME_KEY = 'freshcart_offline_theme_v1';
+      const ICON_SVGS = {
+        'basket': '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m5 11 4-7"/><path d="m19 11-4-7"/><path d="M2 11h20"/><path d="m3.5 11 1.6 7.4a2 2 0 0 0 2 1.6h9.8c.9 0 1.8-.7 2-1.6l1.7-7.4"/></svg>',
+        'cart': '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="21" r="1"/><circle cx="19" cy="21" r="1"/><path d="M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 1.95-1.57l1.65-7.43H5.12"/></svg>',
+        'bag': '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"/><path d="M3 6h18"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>',
+        'checklist': '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m3 17 2 2 4-4"/><path d="m3 7 2 2 4-4"/><path d="M13 6h8"/><path d="M13 12h8"/><path d="M13 18h8"/></svg>',
+        'box': '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m7.5 4.27 9 5.15"/><path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"/><path d="m3.3 7 8.7 5 8.7-5"/><path d="M12 22V12"/></svg>',
+        'heart': '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/></svg>'
+      };
+      const APP_ICONS = [{ id: 'basket', label: 'Basket' }, { id: 'cart', label: 'Cart' }, { id: 'bag', label: 'Bag' }, { id: 'checklist', label: 'List' }, { id: 'box', label: 'Box' }, { id: 'heart', label: 'Heart' }];
+      const THEME_COLORS = ['#007AFF', '#34C759', '#5856D6', '#AF52DE', '#FF9500', '#FF2D55', '#00C7BE', '#475569'];
+      const ACCENT_PALETTE = ['#34C759', '#007AFF', '#AF52DE', '#5856D6', '#FF9500', '#FF2D55', '#00C7BE', '#FF3B30'];
+      const DEFAULT_CATEGORIES = [{ name: 'Food', color: '#34C759' }, { name: 'Daily Essentials', color: '#007AFF' }, { name: 'Clothes', color: '#AF52DE' }, { name: 'Electronics', color: '#5856D6' }, { name: 'Accessories', color: '#FF9500' }, { name: 'Wish List', color: '#FF2D55' }];
+      const DEFAULT_UNITS = [{ name: 'numbers', step: 1 }, { name: 'Kg', step: 0.5 }, { name: 'gm', step: 100 }, { name: 'Liters', step: 0.5 }, { name: 'box', step: 1 }, { name: 'packets', step: 1 }, { name: 'ml', step: 100 }, { name: 'dozen', step: 1 }, { name: 'bottle', step: 1 }, { name: 'pair', step: 1 }];
+      const QUICK_STAPLES = {
+        'All': [{ name: 'Fresh Milk', qty: 1, unit: 'Liters', category: 'Food' }, { name: 'Tomatoes', qty: 1, unit: 'Kg', category: 'Food' }, { name: 'Toothpaste', qty: 1, unit: 'box', category: 'Daily Essentials' }],
+        'Food': [{ name: 'Fresh Milk', qty: 1, unit: 'Liters', category: 'Food' }, { name: 'Tomatoes', qty: 1, unit: 'Kg', category: 'Food' }, { name: 'Onions', qty: 500, unit: 'gm', category: 'Food' }, { name: 'Basmati Rice', qty: 2, unit: 'Kg', category: 'Food' }],
+        'Daily Essentials': [{ name: 'Toothpaste', qty: 1, unit: 'box', category: 'Daily Essentials' }, { name: 'Dishwashing Liquid', qty: 1, unit: 'bottle', category: 'Daily Essentials' }],
+        'Clothes': [{ name: 'T-Shirt', qty: 2, unit: 'numbers', category: 'Clothes' }, { name: 'Crew Socks', qty: 3, unit: 'pair', category: 'Clothes' }],
+        'Electronics': [{ name: 'USB-C Fast Cable', qty: 2, unit: 'numbers', category: 'Electronics' }, { name: 'Power Bank', qty: 1, unit: 'numbers', category: 'Electronics' }],
+        'Accessories': [{ name: 'MagSafe Phone Case', qty: 1, unit: 'numbers', category: 'Accessories' }, { name: 'Sunglasses', qty: 1, unit: 'box', category: 'Accessories' }],
+        'Wish List': [{ name: 'AirPods Pro', qty: 1, unit: 'box', category: 'Wish List' }, { name: 'Kindle', qty: 1, unit: 'numbers', category: 'Wish List' }]
+      };
+      const SAMPLE_ITEMS = [
+        { id: 's1', name: 'Fresh Milk', qty: 2, unit: 'Liters', category: 'Food', note: 'Full cream', checked: false },
+        { id: 's2', name: 'Tomatoes', qty: 1, unit: 'Kg', category: 'Food', note: 'Firm & ripe', checked: false },
+        { id: 's3', name: 'Green Chillies', qty: 250, unit: 'gm', category: 'Food', note: '', checked: false },
+        { id: 's4', name: 'Basmati Rice', qty: 1, unit: 'packets', category: 'Food', note: '5 Kg pack', checked: true },
+        { id: 's5', name: 'Dishwashing Liquid', qty: 1, unit: 'bottle', category: 'Daily Essentials', note: 'Lemon scent', checked: false },
+        { id: 's6', name: 'Tissue Box', qty: 2, unit: 'box', category: 'Daily Essentials', note: '', checked: true },
+        { id: 's7', name: 'Crew Socks', qty: 3, unit: 'pair', category: 'Clothes', note: 'Black / grey', checked: false },
+        { id: 's8', name: 'USB-C Fast Cable', qty: 2, unit: 'numbers', category: 'Electronics', note: '2m braided', checked: false },
+        { id: 's9', name: 'MagSafe Phone Case', qty: 1, unit: 'numbers', category: 'Accessories', note: 'Clear matte', checked: false },
+        { id: 's10', name: 'Noise-Canceling Headphones', qty: 1, unit: 'box', category: 'Wish List', note: 'Wait for sale', checked: false, price: 24990, wishTag: 'Electronics', link: 'https://www.sony.co.in' }
+      ];
+      const SAMPLE_INV = [
+        { id: 'inv1', name: 'Fresh Milk', qty: 0.5, unit: 'Liters', category: 'Food', note: 'Fridge door' },
+        { id: 'inv2', name: 'Tomatoes', qty: 0.5, unit: 'Kg', category: 'Food', note: 'Crisper' },
+        { id: 'inv3', name: 'Basmati Rice', qty: 3, unit: 'Kg', category: 'Food', note: 'Pantry jar' },
+        { id: 'inv4', name: 'Dishwashing Liquid', qty: 0.5, unit: 'bottle', category: 'Daily Essentials', note: 'Under sink' },
+        { id: 'inv5', name: 'Crew Socks', qty: 5, unit: 'pair', category: 'Clothes', note: 'Top drawer' },
+        { id: 'inv6', name: 'USB-C Fast Cable', qty: 1, unit: 'numbers', category: 'Electronics', note: 'Desk drawer' }
+      ];
+
+      let state = { view: 'home', activeList: 'All', categories: [], items: [], inventory: [], settings: { fontSize: 'small', themeColor: '#007AFF', appIcon: 'basket', defaultUnit: 'numbers', units: [] }, filter: 'all', search: '', invSearch: '', grouped: true, selectedNewColor: ACCENT_PALETTE[0], lastUndo: null };
+      let toastTimer = null;
+
+      function loadJSON(k, fb) { try { const r = localStorage.getItem(k); if (r) { const p = JSON.parse(r); if (Array.isArray(p)) return p; } } catch (e) {} return fb.map(x => ({ ...x })); }
+      function loadSettings() { try { const r = localStorage.getItem(SETTINGS_KEY); if (r) { const p = JSON.parse(r); if (p && Array.isArray(p.units) && p.units.length) return { fontSize: p.fontSize || 'small', themeColor: p.themeColor || '#007AFF', appIcon: p.appIcon || 'basket', defaultUnit: p.defaultUnit || p.units[0].name, units: p.units }; } } catch (e) {} return { fontSize: 'small', themeColor: '#007AFF', appIcon: 'basket', defaultUnit: 'numbers', units: DEFAULT_UNITS.map(u => ({ ...u })) }; }
+      function saveAll() { try { localStorage.setItem(LISTS_KEY, JSON.stringify(state.categories)); localStorage.setItem(STORAGE_KEY, JSON.stringify(state.items)); localStorage.setItem(INV_KEY, JSON.stringify(state.inventory)); localStorage.setItem(SETTINGS_KEY, JSON.stringify(state.settings)); } catch (e) {} }
+      function getMeta(n) { return state.categories.find(c => c.name === n) || { name: n, color: '#8E8E93' }; }
+      function fmtQty(v) { const n = Number(v); return Number.isFinite(n) ? (Number.isInteger(n) ? String(n) : String(Number(n.toFixed(2)))) : '0'; }
+      function stepDelta(u) { const f = state.settings.units.find(x => x.name.toLowerCase() === String(u).toLowerCase()); return (f && Number(f.step) > 0) ? Number(f.step) : 1; }
+      function esc(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;'); }
+      function findInv(name) { const c = name.trim().toLowerCase(); if (!c) return null; return state.inventory.find(i => i.name.toLowerCase() === c) || state.inventory.find(i => i.name.toLowerCase().includes(c) || c.includes(i.name.toLowerCase())); }
+
+      function updateHint() {
+        const el = document.getElementById('liveInventoryHint'), v = document.getElementById('itemNameInput').value.trim();
+        if (!v) { el.classList.add('hidden'); return; }
+        const m = findInv(v); el.classList.remove('hidden');
+        if (m) { el.style.background = m.qty > 0 ? 'rgba(52,199,89,0.12)' : 'rgba(255,149,0,0.14)'; el.style.color = m.qty > 0 ? 'var(--ios-green)' : 'var(--ios-orange)'; el.innerHTML = `<span>In Inventory (${esc(m.name)}): <strong>${fmtQty(m.qty)} ${esc(m.unit)}</strong></span><span>Stock</span>`; }
+        else { el.style.background = 'var(--bg-input)'; el.style.color = 'var(--text-secondary)'; el.innerHTML = `<span>Inventory stock: <strong>0</strong> (not in inventory)</span>`; }
+      }
+
+      function showToast(msg, undoFn) { document.getElementById('toastMessage').textContent = msg; state.lastUndo = undoFn || null; document.getElementById('toastUndoBtn').classList.toggle('hidden', !undoFn); document.getElementById('toast').classList.remove('hidden'); clearTimeout(toastTimer); toastTimer = setTimeout(() => { document.getElementById('toast').classList.add('hidden'); state.lastUndo = null; }, 3500); }
+      function applyFontSize(sz) { state.settings.fontSize = sz; document.documentElement.setAttribute('data-font-size', sz); saveAll(); document.querySelectorAll('[data-font-opt]').forEach(b => b.classList.toggle('active', b.dataset.fontOpt === sz)); }
+      function applyThemeColor(hex) { state.settings.themeColor = hex; document.documentElement.style.setProperty('--ios-blue', hex); saveAll(); render(); }
+      function applyTheme(dark) { document.documentElement.classList.toggle('dark', dark); const m = document.querySelector('meta[name="theme-color"]'); if (m) m.setAttribute('content', dark ? '#000000' : '#F2F2F7'); try { localStorage.setItem(THEME_KEY, dark ? 'dark' : 'light'); } catch (e) {} }
+
+      function openDrawer() { const o = document.getElementById('drawerOverlay'); o.classList.remove('hidden'); requestAnimationFrame(() => o.classList.add('open')); }
+      function closeDrawer() { const o = document.getElementById('drawerOverlay'); o.classList.remove('open'); setTimeout(() => o.classList.add('hidden'), 220); }
+      function goHome() { state.view = 'home'; state.search = ''; document.getElementById('searchInput').value = ''; closeDrawer(); render(); }
+      function goList(cat) { state.view = 'list'; state.activeList = cat; state.filter = 'all'; state.search = ''; document.getElementById('searchInput').value = ''; document.getElementById('liveInventoryHint').classList.add('hidden'); syncSelects(); closeDrawer(); render(); }
+      function goInv() { state.view = 'inventory'; state.invSearch = ''; document.getElementById('invSearchInput').value = ''; syncSelects(); closeDrawer(); render(); }
+
+      function syncUnits(keep) {
+        const sels = [document.getElementById('addUnitSelect'), document.getElementById('invUnitSelect'), document.getElementById('editItemUnit'), document.getElementById('defaultUnitSelect')];
+        const prevs = sels.map(s => s.value), opts = state.settings.units.map(u => `<option value="${esc(u.name)}">${esc(u.name)}</option>`).join('');
+        sels.forEach(s => s.innerHTML = opts);
+        const names = state.settings.units.map(u => u.name);
+        if (!names.includes(state.settings.defaultUnit)) state.settings.defaultUnit = names[0] || 'numbers';
+        document.getElementById('defaultUnitSelect').value = state.settings.defaultUnit;
+        document.getElementById('addUnitSelect').value = (keep && names.includes(prevs[0])) ? prevs[0] : state.settings.defaultUnit;
+        document.getElementById('invUnitSelect').value = (keep && names.includes(prevs[1])) ? prevs[1] : state.settings.defaultUnit;
+      }
+      function syncSelects() {
+        const a = document.getElementById('addCategorySelect'), inv = document.getElementById('invCategorySelect'), e = document.getElementById('editItemCategory');
+        const opts = state.categories.map(c => `<option value="${esc(c.name)}">${esc(c.name)}</option>`).join('');
+        a.innerHTML = opts; inv.innerHTML = opts; e.innerHTML = opts;
+        if (state.activeList !== 'All' && state.categories.some(c => c.name === state.activeList)) { a.value = state.activeList; a.classList.add('hidden'); } else a.classList.remove('hidden');
+        const tagOpts = '<option value="">Item category</option>' + state.categories.filter(c => c.name !== 'Wish List').map(c => `<option value="${esc(c.name)}">${esc(c.name)}</option>`).join('') + '<option value="Home & Living">Home &amp; Living</option><option value="Travel">Travel</option><option value="Other">Other</option>';
+        document.getElementById('addWishTagSelect').innerHTML = tagOpts;
+        document.getElementById('editItemWishTag').innerHTML = tagOpts;
+        toggleWishFields();
+      }
+      function toggleWishFields() {
+        const eff = state.activeList !== 'All' ? state.activeList : document.getElementById('addCategorySelect').value;
+        document.getElementById('wishExtraFields').classList.toggle('hidden', String(eff).toLowerCase() !== 'wish list');
+      }
+      function normUrl(r) { const s = String(r || '').trim(); return !s ? '' : (/^https?:\/\//i.test(s) ? s : 'https://' + s); }
+      function fmtPrice(v) { const n = Number(v); return (Number.isFinite(n) && n > 0) ? ('₹' + n.toLocaleString('en-IN', { maximumFractionDigits: 2 })) : ''; }
+      function renderColors(id) { const el = document.getElementById(id); if (!el) return; el.innerHTML = ACCENT_PALETTE.map(h => `<button type="button" data-color="${h}" class="color-dot ${state.selectedNewColor === h ? 'selected' : ''}" style="background:${h};"></button>`).join(''); }
+      function renderSettings() {
+        document.querySelectorAll('[data-font-opt]').forEach(b => b.classList.toggle('active', b.dataset.fontOpt === state.settings.fontSize));
+        document.getElementById('themeColorPicker').innerHTML = THEME_COLORS.map(h => `<button type="button" data-theme-color="${h}" class="color-dot ${state.settings.themeColor === h ? 'selected' : ''}" style="background:${h};"></button>`).join('');
+        document.getElementById('appIconPicker').innerHTML = APP_ICONS.map(ic => `<button type="button" data-app-icon="${ic.id}" class="icon-choice ${state.settings.appIcon === ic.id ? 'active' : ''}">${ICON_SVGS[ic.id]}<span>${ic.label}</span></button>`).join('');
+        document.getElementById('settingsUnitsList').innerHTML = state.settings.units.map(u => `<span class="chip">${esc(u.name)} <span style="opacity:0.6;">(±${fmtQty(u.step)})</span>${state.settings.units.length > 1 ? `<button type="button" data-rm-unit="${esc(u.name)}" class="chip-rm">×</button>` : ''}</span>`).join('');
+        document.getElementById('settingsCategoriesList').innerHTML = state.categories.map(c => `<span class="chip"><span class="dot" style="background:${c.color};"></span>${esc(c.name)}${state.categories.length > 1 ? `<button type="button" data-rm-cat="${esc(c.name)}" class="chip-rm">×</button>` : ''}</span>`).join('');
+        renderColors('settingsCatColors');
+      }
+
+      function unitOpts(curr) { const names = state.settings.units.map(u => u.name); const list = names.includes(curr) ? names : [curr, ...names]; return list.map(u => `<option value="${esc(u)}" ${u === curr ? 'selected' : ''}>${esc(u)}</option>`).join(''); }
+      function rowHTML(item) {
+        const meta = getMeta(item.category), showCat = !state.grouped && state.activeList === 'All', m = findInv(item.name);
+        const stTxt = m ? `In stock: ${fmtQty(m.qty)} ${m.unit}` : 'In stock: 0', stCol = m && m.qty > 0 ? 'var(--ios-green)' : 'var(--text-tertiary)';
+        return `<div class="item-row" data-item-id="${esc(item.id)}">
+          <button type="button" data-action="toggle" class="check-circle ${item.checked ? 'checked' : ''}">${item.checked ? '<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>' : ''}</button>
+          <button type="button" data-action="edit" class="item-main"><span class="item-name ${item.checked ? 'checked' : ''}">${esc(item.name)}</span>
+            <div class="item-meta">${item.category === 'Wish List'
+              ? `${fmtPrice(item.price) ? `<span style="font-weight:700;color:var(--ios-blue);">${esc(fmtPrice(item.price))}</span>` : ''}${item.wishTag ? `<span style="background:var(--bg-input);padding:1px 5px;border-radius:4px;">${esc(item.wishTag)}</span>` : ''}${item.link ? `<a href="${esc(normUrl(item.link))}" target="_blank" rel="noopener noreferrer" data-action="openLink" style="color:var(--ios-blue);font-weight:600;text-decoration:underline;">Link ↗</a>` : ''}`
+              : `<span style="font-weight:600;color:${stCol};">${esc(stTxt)}</span>`
+            }${showCat ? `<span>·</span><span class="dot" style="background:${meta.color};"></span><span>${esc(item.category)}</span>` : ''}${item.note ? `<span>·</span><span>${esc(item.note)}</span>` : ''}</div>
+          </button>
+          <div class="stepper ${item.checked ? 'opacity-60' : ''}"><button type="button" data-action="dec" class="stepper-btn">−</button><button type="button" data-action="edit" class="qty-label">${fmtQty(item.qty)}</button><select data-action="unit" class="inline-unit-select">${unitOpts(item.unit)}</select><button type="button" data-action="inc" class="stepper-btn">+</button></div>
+        </div>`;
+      }
+      function invRowHTML(item) {
+        return `<div class="item-row" data-inv-id="${esc(item.id)}">
+          <button type="button" data-inv-action="toList" class="to-list-btn" title="Add to shopping list">+</button>
+          <button type="button" data-inv-action="edit" class="item-main"><span class="item-name ${item.qty <= 0 ? 'opacity-60' : ''}">${esc(item.name)}</span><div class="item-meta" style="color:${item.qty <= 0 ? 'var(--ios-red)' : 'var(--text-secondary)'};">${item.qty <= 0 ? 'Out of stock' : (item.note ? esc(item.note) : 'In stock')}</div></button>
+          <div class="stepper"><button type="button" data-inv-action="dec" class="stepper-btn">−</button><button type="button" data-inv-action="edit" class="qty-label">${fmtQty(item.qty)}</button><select data-inv-action="unit" class="inline-unit-select">${unitOpts(item.unit)}</select><button type="button" data-inv-action="inc" class="stepper-btn">+</button></div>
+        </div>`;
+      }
+
+      function addOrIncList({ name, qty, unit, category, note = '', price = '', wishTag = '', link = '' }) {
+        const clean = name.trim(); if (!clean) return;
+        const q = Math.max(0.25, parseFloat(qty) || 1), cat = category || (state.activeList !== 'All' ? state.activeList : (state.categories[0]?.name || 'Food')), u = unit || state.settings.defaultUnit;
+        const p = parseFloat(price), lnk = normUrl(link);
+        const m = findInv(clean), suf = (cat !== 'Wish List' && m) ? ` · Stock: ${fmtQty(m.qty)} ${m.unit}` : '';
+        const ex = state.items.find(i => i.name.toLowerCase() === clean.toLowerCase() && i.unit === u && i.category === cat && !i.checked);
+        if (ex) { ex.qty = Number((ex.qty + q).toFixed(2)); if (Number.isFinite(p) && p > 0) ex.price = p; if (wishTag) ex.wishTag = wishTag; if (lnk) ex.link = lnk; showToast(`Updated ${ex.name} (${fmtQty(ex.qty)} ${ex.unit})${suf}`); }
+        else { state.items.unshift({ id: 'i_' + Date.now() + '_' + Math.random().toString(36).slice(2,5), name: clean, qty: q, unit: u, category: cat, note: note.trim(), checked: false, price: (Number.isFinite(p) && p > 0) ? p : '', wishTag: wishTag || '', link: lnk }); showToast(`Added ${clean} (${fmtQty(q)} ${u})${suf}`); }
+        saveAll(); render();
+      }
+      function addOrIncInv({ name, qty, unit, category, note = '' }) {
+        const clean = name.trim(); if (!clean) return;
+        const q = Math.max(0, parseFloat(qty) || 0), cat = category || state.categories[0]?.name || 'Food', u = unit || state.settings.defaultUnit;
+        const ex = state.inventory.find(i => i.name.toLowerCase() === clean.toLowerCase());
+        if (ex) { ex.qty = Number((ex.qty + q).toFixed(2)); ex.unit = u; showToast(`Inventory updated: ${ex.name}`); }
+        else { state.inventory.unshift({ id: 'inv_' + Date.now() + '_' + Math.random().toString(36).slice(2,5), name: clean, qty: q, unit: u, category: cat, note: note.trim() }); showToast(`Added ${clean} to Inventory`); }
+        saveAll(); render();
+      }
+
+      function render() {
+        const isHome = state.view === 'home', isInv = state.view === 'inventory', isList = state.view === 'list';
+        document.getElementById('homeView').classList.toggle('hidden', !isHome);
+        document.getElementById('listView').classList.toggle('hidden', !isList);
+        document.getElementById('inventoryView').classList.toggle('hidden', !isInv);
+        document.getElementById('backHomeBtn').classList.toggle('hidden', isHome);
+
+        document.getElementById('drawerTotalPending').textContent = state.items.filter(i => !i.checked).length;
+        document.getElementById('drawerAllCount').textContent = state.items.length;
+        document.getElementById('drawerInvCount').textContent = state.inventory.length;
+        const db = document.getElementById('drawerAppBadge'); db.style.background = state.settings.themeColor; db.innerHTML = ICON_SVGS[state.settings.appIcon] || ICON_SVGS['basket'];
+        document.getElementById('navHomeBtn').style.background = isHome ? 'var(--bg-input)' : 'transparent';
+        document.getElementById('navAllListsBtn').style.background = (isList && state.activeList === 'All') ? 'var(--bg-input)' : 'transparent';
+        document.getElementById('navInventoryBtn').style.background = isInv ? 'var(--bg-input)' : 'transparent';
+
+        const hb = document.getElementById('headerBadge'); hb.innerHTML = ICON_SVGS[state.settings.appIcon] || ICON_SVGS['basket'];
+
+        if (isInv) {
+          const inS = state.inventory.filter(i => i.qty > 0).length, outS = state.inventory.length - inS;
+          hb.style.background = '#34C759'; document.getElementById('headerTitle').textContent = 'Inventory';
+          document.getElementById('headerSubtitle').textContent = `${state.inventory.length} tracked items`;
+          document.getElementById('summaryCard1Label').textContent = 'Low / Out'; document.getElementById('summaryCard2Label').textContent = 'In Stock';
+          document.getElementById('summaryPendingCount').textContent = outS; document.getElementById('summaryClosedCount').textContent = inS;
+          const q = state.invSearch.trim().toLowerCase(), fil = state.inventory.filter(i => !q || i.name.toLowerCase().includes(q) || i.category.toLowerCase().includes(q));
+          const c = document.getElementById('inventoryContainer'), em = document.getElementById('invEmptyState');
+          if (!fil.length) { c.innerHTML = ''; em.classList.remove('hidden'); return; }
+          em.classList.add('hidden');
+          const g = {}; fil.forEach(i => (g[i.category] = g[i.category] || []).push(i));
+          c.innerHTML = Object.keys(g).map(k => `<div class="group-block"><div class="group-header"><span class="group-title-btn"><span class="dot" style="background:${getMeta(k).color};"></span>${esc(k)}</span><span class="group-count">${g[k].length}</span></div><div class="card">${g[k].map(invRowHTML).join('')}</div></div>`).join('');
+          return;
+        }
+
+        document.getElementById('summaryCard1Label').textContent = 'Pending'; document.getElementById('summaryCard2Label').textContent = 'Closed';
+        const scoped = (isHome || state.activeList === 'All') ? state.items : state.items.filter(i => i.category === state.activeList);
+        const total = scoped.length, checked = scoped.filter(i => i.checked).length, pending = total - checked;
+        hb.style.background = (isHome || state.activeList === 'All') ? state.settings.themeColor : getMeta(state.activeList).color;
+        document.getElementById('headerTitle').textContent = isHome ? 'FreshCart' : (state.activeList === 'All' ? 'All Items' : state.activeList);
+        document.getElementById('headerSubtitle').textContent = pending === 0 && total > 0 ? 'All items closed' : `${pending} ${pending === 1 ? 'pending item' : 'pending items'}`;
+        document.getElementById('summaryPendingCount').textContent = pending; document.getElementById('summaryClosedCount').textContent = checked;
+
+        if (isHome) {
+          document.getElementById('dashboardGrid').innerHTML = state.categories.map(c => {
+            const ci = state.items.filter(i => i.category === c.name), pi = ci.filter(i => !i.checked), closedCnt = ci.length - pi.length;
+            const prev = pi.slice(0, 2).map(i => `${i.name} (${fmtQty(i.qty)} ${i.unit})`).join(', ');
+            return `<button type="button" data-open-cat="${esc(c.name)}" class="dash-tile">
+              <div class="dash-bar" style="background:${c.color};"></div>
+              <div style="display:flex;align-items:center;gap:10px;min-width:0;flex:1;"><span class="dot" style="width:10px;height:10px;background:${c.color};"></span><div style="min-width:0;flex:1;"><div class="dash-name">${esc(c.name)}</div><div class="dash-preview">${prev ? esc(prev) : (closedCnt > 0 ? 'All items closed' : 'Tap to add items')}</div></div></div>
+              <div style="display:flex;align-items:center;gap:10px;flex-shrink:0;"><div style="text-align:right;"><div class="dash-num" style="color:${pi.length ? 'var(--text-primary)' : 'var(--ios-green)'};">${pi.length}</div><div class="dash-lbl">Pending</div></div><span style="color:var(--text-tertiary);font-size:16px;">›</span></div>
+            </button>`;
+          }).join('');
+          return;
+        }
+
+        const st = QUICK_STAPLES[state.activeList] || QUICK_STAPLES['All'];
+        document.getElementById('quickStaples').innerHTML = '<span class="staple-label">Quick:</span>' + st.map((s, idx) => `<button type="button" data-staple-idx="${idx}" class="staple-btn">+ ${esc(s.name)}</button>`).join('');
+        document.getElementById('countAll').textContent = total; document.getElementById('countActive').textContent = pending; document.getElementById('countChecked').textContent = checked;
+        document.getElementById('clearCheckedBtn').disabled = checked === 0;
+        document.getElementById('groupToggleLabel').textContent = state.grouped ? 'Grouped' : 'Flat';
+        document.getElementById('groupToggleBtn').classList.toggle('hidden', state.activeList !== 'All');
+        document.querySelectorAll('[data-filter]').forEach(b => b.classList.toggle('active', b.dataset.filter === state.filter));
+
+        const q = state.search.trim().toLowerCase();
+        const filtered = scoped.filter(i => {
+          if (state.filter === 'active' && i.checked) return false;
+          if (state.filter === 'checked' && !i.checked) return false;
+          if (q) return i.name.toLowerCase().includes(q) || i.category.toLowerCase().includes(q) || (i.note && i.note.toLowerCase().includes(q));
+          return true;
+        }).sort((a, b) => Number(a.checked) - Number(b.checked));
+
+        const listEl = document.getElementById('listContainer'), emptyEl = document.getElementById('emptyState');
+        if (!filtered.length) { listEl.innerHTML = ''; emptyEl.classList.remove('hidden'); return; }
+        emptyEl.classList.add('hidden');
+        if (!state.grouped || state.activeList !== 'All') {
+          const al = filtered.filter(i => !i.checked), cl = filtered.filter(i => i.checked);
+          if (state.filter === 'all' && al.length && cl.length) {
+            const col = state.activeList === 'All' ? state.settings.themeColor : getMeta(state.activeList).color;
+            listEl.innerHTML = `<div class="group-block"><div class="group-header"><span class="group-title-btn"><span class="dot" style="background:${col};"></span>Pending</span><span class="group-count">${al.length}</span></div><div class="card">${al.map(rowHTML).join('')}</div></div><div class="group-block"><div class="group-header"><span class="group-title-btn"><span class="dot" style="background:#34C759;"></span>Closed</span><span class="group-count">${cl.length}</span></div><div class="card opacity-85">${cl.map(rowHTML).join('')}</div></div>`;
+          } else listEl.innerHTML = `<div class="card">${filtered.map(rowHTML).join('')}</div>`;
+        } else {
+          const groups = {}; filtered.forEach(i => { const k = i.checked && state.filter === 'all' ? 'Closed' : i.category; (groups[k] = groups[k] || []).push(i); });
+          const ord = state.categories.map(c => c.name);
+          const keys = Object.keys(groups).sort((a, b) => a === 'Closed' ? 1 : b === 'Closed' ? -1 : (ord.indexOf(a) - ord.indexOf(b)));
+          listEl.innerHTML = keys.map(k => { const cart = k === 'Closed', col = cart ? '#34C759' : getMeta(k).color; return `<div class="group-block"><div class="group-header"><button type="button" ${!cart ? `data-jump-list="${esc(k)}"` : ''} class="group-title-btn"><span class="dot" style="background:${col};"></span>${esc(k)}</button><span class="group-count">${groups[k].length}</span></div><div class="card ${cart ? 'opacity-85' : ''}">${groups[k].map(rowHTML).join('')}</div></div>`; }).join('');
+        }
+      }
+
+      // Wire events
+      document.getElementById('openDrawerBtn').addEventListener('click', openDrawer);
+      document.getElementById('closeDrawerBtn').addEventListener('click', closeDrawer);
+      document.getElementById('drawerBackdrop').addEventListener('click', closeDrawer);
+      document.getElementById('backHomeBtn').addEventListener('click', goHome);
+      document.getElementById('listBackDashBtn').addEventListener('click', goHome);
+      document.getElementById('navHomeBtn').addEventListener('click', goHome);
+      document.getElementById('navAllListsBtn').addEventListener('click', () => goList('All'));
+      document.getElementById('navInventoryBtn').addEventListener('click', goInv);
+      document.getElementById('homeOpenAllBtn').addEventListener('click', () => goList('All'));
+      document.getElementById('homeOpenInventoryBtn').addEventListener('click', goInv);
+      document.getElementById('dashboardGrid').addEventListener('click', e => { const t = e.target.closest('[data-open-cat]'); if (t) goList(t.dataset.openCat); });
+      document.getElementById('summaryPendingCard').addEventListener('click', () => { if (state.view === 'inventory') return; if (state.view === 'home') goList('All'); state.filter = 'active'; render(); });
+      document.getElementById('summaryClosedCard').addEventListener('click', () => { if (state.view === 'inventory') return; if (state.view === 'home') goList('All'); state.filter = 'checked'; render(); });
+
+      const np = document.getElementById('drawerNotepad');
+      try { np.value = localStorage.getItem(NOTEPAD_KEY) || ''; } catch (e) {}
+      np.addEventListener('input', () => { try { localStorage.setItem(NOTEPAD_KEY, np.value); } catch (e) {} });
+      document.getElementById('clearNotepadBtn').addEventListener('click', () => { if (!np.value) return; const p = np.value; np.value = ''; try { localStorage.setItem(NOTEPAD_KEY, ''); } catch (e) {} showToast('Notepad cleared', () => { np.value = p; try { localStorage.setItem(NOTEPAD_KEY, p); } catch (e) {} }); });
+
+      const openSettings = () => { closeDrawer(); renderSettings(); document.getElementById('settingsModal').classList.remove('hidden'); };
+      document.getElementById('settingsBtn').addEventListener('click', openSettings);
+      document.getElementById('homeOpenSettingsBtn').addEventListener('click', openSettings);
+      document.getElementById('closeSettingsModal').addEventListener('click', () => document.getElementById('settingsModal').classList.add('hidden'));
+      document.getElementById('doneSettingsBtn').addEventListener('click', () => document.getElementById('settingsModal').classList.add('hidden'));
+      document.getElementById('settingsModal').addEventListener('click', e => { if (e.target.id === 'settingsModal') e.target.classList.add('hidden'); });
+      document.getElementById('fontSizePicker').addEventListener('click', e => { const b = e.target.closest('[data-font-opt]'); if (!b) return; applyFontSize(b.dataset.fontOpt); showToast(`Font size: ${b.dataset.fontOpt}`); });
+      document.getElementById('themeColorPicker').addEventListener('click', e => { const b = e.target.closest('[data-theme-color]'); if (!b) return; applyThemeColor(b.dataset.themeColor); renderSettings(); showToast('Theme color updated'); });
+      document.getElementById('appIconPicker').addEventListener('click', e => { const b = e.target.closest('[data-app-icon]'); if (!b) return; state.settings.appIcon = b.dataset.appIcon; saveAll(); renderSettings(); render(); showToast('App icon updated'); });
+      document.getElementById('defaultUnitSelect').addEventListener('change', e => { state.settings.defaultUnit = e.target.value; saveAll(); syncUnits(false); showToast(`Default unit: ${e.target.value}`); });
+      document.getElementById('addUnitForm').addEventListener('submit', e => { e.preventDefault(); const n = document.getElementById('newUnitNameInput').value.trim(); if (!n) return; if (state.settings.units.some(u => u.name.toLowerCase() === n.toLowerCase())) { showToast('Unit exists'); return; } state.settings.units.push({ name: n, step: Math.max(0.1, parseFloat(document.getElementById('newUnitStepInput').value) || 1) }); saveAll(); syncUnits(true); renderSettings(); render(); document.getElementById('newUnitNameInput').value = ''; showToast(`Added unit "${n}"`); });
+      document.getElementById('settingsUnitsList').addEventListener('click', e => { const b = e.target.closest('[data-rm-unit]'); if (!b || state.settings.units.length <= 1) return; state.settings.units = state.settings.units.filter(u => u.name !== b.dataset.rmUnit); saveAll(); syncUnits(true); renderSettings(); render(); showToast('Removed unit'); });
+      document.getElementById('settingsCatColors').addEventListener('click', e => { const b = e.target.closest('[data-color]'); if (!b) return; state.selectedNewColor = b.dataset.color; renderColors('settingsCatColors'); });
+      document.getElementById('settingsAddCatForm').addEventListener('submit', e => { e.preventDefault(); const inp = document.getElementById('settingsCatNameInput'), name = inp.value.trim(); if (!name) return; if (state.categories.some(c => c.name.toLowerCase() === name.toLowerCase())) { showToast('Category exists'); return; } state.categories.push({ name, color: state.selectedNewColor }); saveAll(); syncSelects(); renderSettings(); render(); inp.value = ''; showToast(`Added "${name}"`); });
+      document.getElementById('settingsCategoriesList').addEventListener('click', e => { const b = e.target.closest('[data-rm-cat]'); if (!b || state.categories.length <= 1) return; state.categories = state.categories.filter(c => c.name !== b.dataset.rmCat); if (state.activeList === b.dataset.rmCat) state.view = 'home'; saveAll(); syncSelects(); renderSettings(); render(); showToast('Removed category'); });
+
+      document.getElementById('itemNameInput').addEventListener('input', updateHint);
+      document.getElementById('addCategorySelect').addEventListener('change', toggleWishFields);
+      document.getElementById('editItemCategory').addEventListener('change', e => { document.getElementById('editWishFields').classList.toggle('hidden', !(document.getElementById('editItemTarget').value === 'list' && e.target.value === 'Wish List')); });
+      document.getElementById('quickAddForm').addEventListener('submit', e => { e.preventDefault(); const inp = document.getElementById('itemNameInput'); if (!inp.value.trim()) { inp.focus(); return; } const cat = state.activeList !== 'All' ? state.activeList : document.getElementById('addCategorySelect').value; addOrIncList({ name: inp.value, qty: document.getElementById('addQtyInput').value, unit: document.getElementById('addUnitSelect').value, category: cat, price: document.getElementById('addPriceInput').value, wishTag: document.getElementById('addWishTagSelect').value, link: document.getElementById('addLinkInput').value }); inp.value = ''; document.getElementById('addQtyInput').value = '1'; document.getElementById('addPriceInput').value = ''; document.getElementById('addLinkInput').value = ''; document.getElementById('addWishTagSelect').value = ''; document.getElementById('liveInventoryHint').classList.add('hidden'); inp.focus(); });
+      document.getElementById('addQtyMinus').addEventListener('click', () => { const inp = document.getElementById('addQtyInput'), d = stepDelta(document.getElementById('addUnitSelect').value); inp.value = fmtQty(Math.max(d >= 1 ? 1 : 0.25, (parseFloat(inp.value) || 1) - d)); });
+      document.getElementById('addQtyPlus').addEventListener('click', () => { const inp = document.getElementById('addQtyInput'), d = stepDelta(document.getElementById('addUnitSelect').value); inp.value = fmtQty((parseFloat(inp.value) || 0) + d); });
+      document.getElementById('quickStaples').addEventListener('click', e => { const b = e.target.closest('[data-staple-idx]'); if (!b) return; const st = (QUICK_STAPLES[state.activeList] || QUICK_STAPLES['All'])[Number(b.dataset.stapleIdx)]; if (st) addOrIncList({ ...st, category: state.activeList !== 'All' ? state.activeList : st.category }); });
+      document.getElementById('searchInput').addEventListener('input', e => { state.search = e.target.value; render(); });
+      document.getElementById('groupToggleBtn').addEventListener('click', () => { state.grouped = !state.grouped; render(); });
+      document.querySelectorAll('[data-filter]').forEach(b => b.addEventListener('click', () => { state.filter = b.dataset.filter; render(); }));
+
+      document.getElementById('listContainer').addEventListener('change', e => { const sel = e.target.closest('select[data-action="unit"]'); if (!sel) return; const row = sel.closest('[data-item-id]'); if (!row) return; const item = state.items.find(i => i.id === row.dataset.itemId); if (!item) return; item.unit = sel.value; saveAll(); showToast(`${item.name}: ${fmtQty(item.qty)} ${item.unit}`); });
+      document.getElementById('listContainer').addEventListener('click', e => {
+        if (e.target.closest('select[data-action="unit"]') || e.target.closest('a[data-action="openLink"]')) return;
+        const j = e.target.closest('[data-jump-list]'); if (j) { goList(j.dataset.jumpList); return; }
+        const row = e.target.closest('[data-item-id]'), act = e.target.closest('[data-action]'); if (!row || !act) return;
+        const item = state.items.find(i => i.id === row.dataset.itemId); if (!item) return;
+        const a = act.dataset.action;
+        if (a === 'toggle') { item.checked = !item.checked; saveAll(); render(); }
+        else if (a === 'inc') { item.qty = Number((item.qty + stepDelta(item.unit)).toFixed(2)); saveAll(); render(); }
+        else if (a === 'dec') { const d = stepDelta(item.unit); if (item.qty - d <= 0) { const snap = [...state.items]; state.items = state.items.filter(i => i.id !== item.id); saveAll(); render(); showToast(`Removed ${item.name}`, () => { state.items = snap; saveAll(); render(); }); } else { item.qty = Number((item.qty - d).toFixed(2)); saveAll(); render(); } }
+        else if (a === 'edit') openEdit(item.id, 'list');
+      });
+
+      document.getElementById('invAddForm').addEventListener('submit', e => { e.preventDefault(); const inp = document.getElementById('invNameInput'); if (!inp.value.trim()) { inp.focus(); return; } addOrIncInv({ name: inp.value, qty: document.getElementById('invQtyInput').value, unit: document.getElementById('invUnitSelect').value, category: document.getElementById('invCategorySelect').value }); inp.value = ''; document.getElementById('invQtyInput').value = '1'; inp.focus(); });
+      document.getElementById('invQtyMinus').addEventListener('click', () => { const inp = document.getElementById('invQtyInput'), d = stepDelta(document.getElementById('invUnitSelect').value); inp.value = fmtQty(Math.max(0, (parseFloat(inp.value) || 0) - d)); });
+      document.getElementById('invQtyPlus').addEventListener('click', () => { const inp = document.getElementById('invQtyInput'), d = stepDelta(document.getElementById('invUnitSelect').value); inp.value = fmtQty((parseFloat(inp.value) || 0) + d); });
+      document.getElementById('invSearchInput').addEventListener('input', e => { state.invSearch = e.target.value; render(); });
+      document.getElementById('inventoryContainer').addEventListener('change', e => { const sel = e.target.closest('select[data-inv-action="unit"]'); if (!sel) return; const row = sel.closest('[data-inv-id]'); if (!row) return; const item = state.inventory.find(i => i.id === row.dataset.invId); if (!item) return; item.unit = sel.value; saveAll(); showToast(`${item.name}: ${fmtQty(item.qty)} ${item.unit}`); });
+      document.getElementById('inventoryContainer').addEventListener('click', e => {
+        if (e.target.closest('select[data-inv-action="unit"]')) return;
+        const row = e.target.closest('[data-inv-id]'), act = e.target.closest('[data-inv-action]'); if (!row || !act) return;
+        const item = state.inventory.find(i => i.id === row.dataset.invId); if (!item) return;
+        const a = act.dataset.invAction;
+        if (a === 'inc') { item.qty = Number((item.qty + stepDelta(item.unit)).toFixed(2)); saveAll(); render(); }
+        else if (a === 'dec') { item.qty = Math.max(0, Number((item.qty - stepDelta(item.unit)).toFixed(2))); saveAll(); render(); }
+        else if (a === 'toList') { addOrIncList({ name: item.name, qty: 1, unit: item.unit, category: item.category }); }
+        else if (a === 'edit') openEdit(item.id, 'inventory');
+      });
+
+      function openEdit(id, target) {
+        const arr = target === 'inventory' ? state.inventory : state.items, item = arr.find(i => i.id === id); if (!item) return;
+        syncUnits(true); syncSelects();
+        document.getElementById('editModalTitle').textContent = target === 'inventory' ? 'Edit Inventory Item' : 'Edit List Item';
+        document.getElementById('editItemId').value = item.id; document.getElementById('editItemTarget').value = target;
+        document.getElementById('editItemName').value = item.name; document.getElementById('editItemQty').value = fmtQty(item.qty);
+        const eu = document.getElementById('editItemUnit'); if (!Array.from(eu.options).some(o => o.value === item.unit)) eu.insertAdjacentHTML('beforeend', `<option value="${esc(item.unit)}">${esc(item.unit)}</option>`);
+        eu.value = item.unit; document.getElementById('editItemCategory').value = item.category; document.getElementById('editItemNote').value = item.note || '';
+        document.getElementById('editWishFields').classList.toggle('hidden', !(target === 'list' && item.category === 'Wish List'));
+        document.getElementById('editItemPrice').value = item.price || ''; document.getElementById('editItemWishTag').value = item.wishTag || ''; document.getElementById('editItemLink').value = item.link || '';
+        document.getElementById('editModal').classList.remove('hidden');
+      }
+      document.getElementById('editItemForm').addEventListener('submit', e => {
+        e.preventDefault(); const t = document.getElementById('editItemTarget').value, arr = t === 'inventory' ? state.inventory : state.items;
+        const item = arr.find(i => i.id === document.getElementById('editItemId').value); if (!item) return;
+        item.name = document.getElementById('editItemName').value.trim() || item.name; item.qty = Math.max(t === 'inventory' ? 0 : 0.25, parseFloat(document.getElementById('editItemQty').value) || 0);
+        item.unit = document.getElementById('editItemUnit').value; item.category = document.getElementById('editItemCategory').value; item.note = document.getElementById('editItemNote').value.trim();
+        if (t === 'list' && item.category === 'Wish List') { const p = parseFloat(document.getElementById('editItemPrice').value); item.price = (Number.isFinite(p) && p > 0) ? p : ''; item.wishTag = document.getElementById('editItemWishTag').value; item.link = normUrl(document.getElementById('editItemLink').value); }
+        saveAll(); document.getElementById('editModal').classList.add('hidden'); render(); showToast('Updated');
+      });
+      document.getElementById('deleteItemModalBtn').addEventListener('click', () => {
+        const t = document.getElementById('editItemTarget').value, id = document.getElementById('editItemId').value;
+        if (t === 'inventory') { const snap = [...state.inventory]; state.inventory = state.inventory.filter(i => i.id !== id); saveAll(); document.getElementById('editModal').classList.add('hidden'); render(); showToast('Deleted', () => { state.inventory = snap; saveAll(); render(); }); }
+        else { const snap = [...state.items]; state.items = state.items.filter(i => i.id !== id); saveAll(); document.getElementById('editModal').classList.add('hidden'); render(); showToast('Deleted', () => { state.items = snap; saveAll(); render(); }); }
+      });
+      document.getElementById('closeEditModal').addEventListener('click', () => document.getElementById('editModal').classList.add('hidden'));
+      document.getElementById('editModal').addEventListener('click', e => { if (e.target.id === 'editModal') e.target.classList.add('hidden'); });
+
+      document.getElementById('clearCheckedBtn').addEventListener('click', () => { const targets = state.items.filter(i => i.checked && (state.activeList === 'All' || i.category === state.activeList)); if (!targets.length) return; const ids = new Set(targets.map(t => t.id)), snap = [...state.items]; state.items = state.items.filter(i => !ids.has(i.id)); saveAll(); render(); showToast(`Cleared ${targets.length} closed items`, () => { state.items = snap; saveAll(); render(); }); });
+      document.getElementById('resetSampleBtn').addEventListener('click', () => { const sc = [...state.categories], si = [...state.items], sinv = [...state.inventory]; state.categories = DEFAULT_CATEGORIES.map(c => ({ ...c })); state.items = SAMPLE_ITEMS.map(i => ({ ...i })); state.inventory = SAMPLE_INV.map(i => ({ ...i })); saveAll(); syncSelects(); render(); showToast('Sample loaded', () => { state.categories = sc; state.items = si; state.inventory = sinv; saveAll(); syncSelects(); render(); }); });
+      document.getElementById('copyListBtn').addEventListener('click', () => {
+        const txt = state.view === 'inventory'
+          ? state.inventory.map(i => `- ${i.name}: ${fmtQty(i.qty)} ${i.unit} (${i.category})`).join('\n')
+          : ((state.view === 'home' || state.activeList === 'All') ? state.items : state.items.filter(i => i.category === state.activeList)).map(i => `${i.checked ? '[x]' : '[ ]'} ${i.name} — ${fmtQty(i.qty)} ${i.unit} (${i.category})`).join('\n');
+        if (!txt) { showToast('Nothing to copy'); return; }
+        if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(txt).then(() => showToast('Copied'));
+      });
+      document.getElementById('themeToggleBtn').addEventListener('click', () => applyTheme(!document.documentElement.classList.contains('dark')));
+      document.getElementById('toastUndoBtn').addEventListener('click', () => { if (state.lastUndo) { state.lastUndo(); state.lastUndo = null; document.getElementById('toast').classList.add('hidden'); } });
+
+      state.settings = loadSettings();
+      state.categories = loadJSON(LISTS_KEY, DEFAULT_CATEGORIES);
+      if (!state.categories.length) state.categories = DEFAULT_CATEGORIES.map(c => ({ ...c }));
+      state.items = loadJSON(STORAGE_KEY, SAMPLE_ITEMS);
+      state.inventory = loadJSON(INV_KEY, SAMPLE_INV);
+      document.documentElement.style.setProperty('--ios-blue', state.settings.themeColor);
+      applyFontSize(state.settings.fontSize);
+      syncUnits(false);
+      syncSelects();
+      let dark = false; try { const t = localStorage.getItem(THEME_KEY); dark = t ? t === 'dark' : (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches); } catch (e) {}
+      applyTheme(dark);
+      render();
+    })();
+  </script>
+</body>
+</html>
